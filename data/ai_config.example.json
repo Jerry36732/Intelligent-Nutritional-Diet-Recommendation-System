@@ -1,0 +1,7 @@
+{
+  "siliconflow_api_key": "YOUR_SILICONFLOW_API_KEY",
+  "siliconflow_model": "Qwen/Qwen2.5-7B-Instruct",
+  "ollama_base_url": "http://127.0.0.1:11434",
+  "ollama_model": "qwen2.5:7b",
+  "preferred_provider": "siliconflow"
+}

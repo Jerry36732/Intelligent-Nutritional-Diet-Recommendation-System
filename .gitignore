@@ -1,0 +1,120 @@
+# This file is used to ignore files which are generated
+# ----------------------------------------------------------------------------
+
+*~
+*.autosave
+*.a
+*.core
+*.moc
+*.o
+*.obj
+*.orig
+*.rej
+*.so
+*.so.*
+*_pch.h.cpp
+*_resource.rc
+*.qm
+.#*
+*.*#
+core
+!core/
+tags
+.DS_Store
+.directory
+*.debug
+Makefile*
+*.prl
+*.app
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Thumbs.db
+*.res
+*.rc
+/.qmake.cache
+/.qmake.stash
+**/.qmlls.ini
+
+# qtcreator generated files
+*.pro.user*
+*.qbs.user*
+CMakeLists.txt.user*
+
+# xemacs temporary files
+*.flc
+
+# Vim temporary files
+.*.swp
+
+# Visual Studio generated files
+*.ib_pdb_index
+*.idb
+*.ilk
+*.pdb
+*.sln
+*.suo
+*.vcproj
+*vcproj.*.*.user
+*.ncb
+*.sdf
+*.opensdf
+*.vcxproj
+*vcxproj.*
+
+# MinGW generated files
+*.Debug
+*.Release
+
+# Python byte code
+*.pyc
+
+# Binaries
+# --------
+*.dll
+*.exe
+
+# Directories with generated files
+.moc/
+.obj/
+.pch/
+.rcc/
+.uic/
+/build*/
+/.qtcreator/
+
+# 本地密钥，勿提交
+data/ai_config.json
+*.local.json
+
+# 构建与日志
+build/
+build_*/
+*.log
+generate_log.txt
+
+# 体积过大的爬取/原始数据（勿上传）
+FoodData/
+食谱数据/
+
+# 报告草稿与临时 Office 文件
+report/
+report_content/
+~$*
+*.doc
+*.docx
+
+# Qt Creator 旧模板残留（真实入口在 src/）
+/main.cpp
+/mainwindow.cpp
+/mainwindow.h
+/mainwindow.ui
+
+# 本地脚本缓存
+__pycache__/
+.venv/
+
+
+scripts/*.txt
+scripts/*.html
+
