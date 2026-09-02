@@ -1,5 +1,7 @@
 #include "SettingsDialog.h"
+#include "HealthProfileOptions.h"
 #include "TagChipGroup.h"
+#include "UiAssets.h"
 
 #include "../services/UserService.h"
 
@@ -7,175 +9,291 @@
 #include <QComboBox>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
-#include <QFormLayout>
 #include <QFrame>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QScrollArea>
+#include <QShowEvent>
 #include <QVBoxLayout>
+
+namespace {
+QString joinOrEmpty(const QStringList &values, const QString &empty)
+{
+    return values.isEmpty() ? empty : values.join(QStringLiteral("、"));
+}
+
+void editHealthTags(QWidget *parent, const QString &title, const QStringList &options,
+                    TagChipGroup *storage, QLabel *summary, const QString &emptyText)
+{
+    QDialog dialog(parent);
+    dialog.setWindowTitle(title);
+    dialog.setModal(true);
+    dialog.setObjectName(QStringLiteral("HealthTagEditor"));
+    dialog.resize(430, 320);
+    auto *root = new QVBoxLayout(&dialog);
+    root->setContentsMargins(20, 18, 20, 16);
+    root->setSpacing(14);
+    auto *caption = new QLabel(title, &dialog);
+    caption->setObjectName(QStringLiteral("DialogTitle"));
+    caption->setFont(UiAssets::titleFont(21));
+    auto *editor = new TagChipGroup(title, options, &dialog, 6, true);
+    editor->setSelected(storage->selected());
+    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::Save,
+                                         &dialog);
+    buttons->button(QDialogButtonBox::Save)->setText(QStringLiteral("保存"));
+    buttons->button(QDialogButtonBox::Cancel)->setText(QStringLiteral("取消"));
+    buttons->button(QDialogButtonBox::Save)->setProperty("class", QStringLiteral("PrimaryButton"));
+    buttons->button(QDialogButtonBox::Cancel)->setProperty("class", QStringLiteral("GhostButton"));
+    QObject::connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+    QObject::connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+    root->addWidget(caption);
+    root->addWidget(editor, 1);
+    root->addWidget(buttons);
+    if (dialog.exec() == QDialog::Accepted) {
+        storage->setSelected(editor->selected());
+        summary->setText(joinOrEmpty(storage->selected(), emptyText));
+    }
+}
+
+QWidget *fieldBlock(QWidget *parent, const QString &labelText, QWidget *field)
+{
+    auto *host = new QWidget(parent);
+    host->setObjectName(QStringLiteral("SettingsFieldBlock"));
+    auto *layout = new QVBoxLayout(host);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(4);
+    auto *label = new QLabel(labelText, host);
+    label->setObjectName(QStringLiteral("SettingsFieldLabel"));
+    field->setParent(host);
+    // QSS 的水平/垂直内边距也计入最终尺寸；26 logical px 对应目标图约 34 px 外框。
+    field->setFixedHeight(44);
+    layout->addWidget(label);
+    layout->addWidget(field);
+    return host;
+}
+} // namespace
 
 SettingsDialog::SettingsDialog(const User &user, QWidget *parent)
     : QDialog(parent)
     , m_user(user)
 {
-    setWindowTitle(QStringLiteral("健康档案 · %1").arg(user.name.isEmpty() ? QStringLiteral("用户") : user.name));
+    setWindowTitle(QStringLiteral("健康档案 · %1").arg(
+        user.name.isEmpty() ? QStringLiteral("用户") : user.name));
     setModal(true);
-    resize(520, 680);
-    setMinimumSize(480, 560);
+    setWindowFlag(Qt::FramelessWindowHint, true);
+    setObjectName(QStringLiteral("SettingsDialog"));
+    setFixedSize(620, 690);
 
     auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(22, 20, 22, 16);
-    root->setSpacing(12);
+    root->setSizeConstraint(QLayout::SetNoConstraint);
+    root->setContentsMargins(30, 22, 30, 28);
+    root->setSpacing(14);
 
-    auto *title = new QLabel(QStringLiteral("多维健康档案"), this);
+    auto *header = new QWidget(this);
+    header->setObjectName(QStringLiteral("SettingsHeader"));
+    header->setFixedHeight(54);
+    auto *headerLay = new QHBoxLayout(header);
+    headerLay->setContentsMargins(0, 0, 0, 0);
+    auto *title = new QLabel(QStringLiteral("设置"), header);
     title->setObjectName(QStringLiteral("DialogTitle"));
-    auto *subtitle = new QLabel(
-        QStringLiteral("参考营养膳食推荐研究中的用户模型：饮食选择、不耐受、营养缺乏、过敏与医疗状况。"),
-        this);
-    subtitle->setWordWrap(true);
-    subtitle->setProperty("class", QVariant(QStringLiteral("HintText")));
+    title->setFont(UiAssets::titleFont(28));
+    title->setAlignment(Qt::AlignCenter);
+    auto *closeBtn = new QPushButton(header);
+    closeBtn->setObjectName(QStringLiteral("DialogCloseButton"));
+    closeBtn->setFixedSize(36, 36);
+    UiAssets::setButtonIcon(closeBtn, QStringLiteral("close"), 20,
+                            QColor(QStringLiteral("#FFFFFF")));
+    headerLay->addSpacing(28);
+    headerLay->addStretch();
+    headerLay->addWidget(title);
+    headerLay->addStretch();
+    headerLay->addWidget(closeBtn);
+    connect(closeBtn, &QPushButton::clicked, this, &QDialog::reject);
 
-    auto *scroll = new QScrollArea(this);
-    scroll->setWidgetResizable(true);
-    scroll->setFrameShape(QFrame::NoFrame);
-    auto *body = new QWidget;
+    auto *body = new QWidget(this);
+    body->setObjectName(QStringLiteral("SettingsBody"));
     auto *bodyLay = new QVBoxLayout(body);
-    bodyLay->setContentsMargins(0, 0, 8, 0);
-    bodyLay->setSpacing(16);
+    bodyLay->setContentsMargins(2, 0, 2, 0);
+    bodyLay->setSpacing(9);
 
-    auto *basicTitle = new QLabel(QStringLiteral("基础信息"), body);
-    basicTitle->setObjectName(QStringLiteral("TagGroupTitle"));
-    auto *form = new QFormLayout;
-    form->setSpacing(12);
+    auto *basicTitle = new QLabel(QStringLiteral("基本资料"), body);
+    basicTitle->setObjectName(QStringLiteral("SettingsSectionTitle"));
+    bodyLay->addWidget(basicTitle);
+
+    auto *nameEdit = new QLineEdit(user.name, body);
+    nameEdit->setReadOnly(true);
+    m_genderCombo = new QComboBox(body);
+    m_genderCombo->addItem(QStringLiteral("男"), QStringLiteral("male"));
+    m_genderCombo->addItem(QStringLiteral("女"), QStringLiteral("female"));
+    m_genderCombo->setCurrentIndex(
+        user.gender.compare(QStringLiteral("female"), Qt::CaseInsensitive) == 0 ? 1 : 0);
 
     m_heightSpin = new QDoubleSpinBox(body);
     m_heightSpin->setRange(100.0, 250.0);
     m_heightSpin->setDecimals(1);
     m_heightSpin->setValue(user.height > 0 ? user.height : 170.0);
     m_heightSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-    auto *heightWrap = new QWidget(body);
-    auto *heightLay = new QHBoxLayout(heightWrap);
-    heightLay->setContentsMargins(0, 0, 0, 0);
-    heightLay->addWidget(m_heightSpin);
-    heightLay->addWidget(new QLabel(QStringLiteral("cm"), heightWrap));
+    UiAssets::attachFixedUnit(m_heightSpin, QStringLiteral("cm"));
 
     m_weightSpin = new QDoubleSpinBox(body);
     m_weightSpin->setRange(30.0, 200.0);
     m_weightSpin->setDecimals(1);
     m_weightSpin->setValue(user.weight > 0 ? user.weight : 65.0);
     m_weightSpin->setButtonSymbols(QAbstractSpinBox::NoButtons);
-    auto *weightWrap = new QWidget(body);
-    auto *weightLay = new QHBoxLayout(weightWrap);
-    weightLay->setContentsMargins(0, 0, 0, 0);
-    weightLay->addWidget(m_weightSpin);
-    weightLay->addWidget(new QLabel(QStringLiteral("kg"), weightWrap));
-
-    m_genderCombo = new QComboBox(body);
-    m_genderCombo->addItem(QStringLiteral("男"), QStringLiteral("male"));
-    m_genderCombo->addItem(QStringLiteral("女"), QStringLiteral("female"));
-    m_genderCombo->setCurrentIndex(user.gender.compare(QStringLiteral("female"), Qt::CaseInsensitive) == 0 ? 1 : 0);
+    UiAssets::attachFixedUnit(m_weightSpin, QStringLiteral("kg"));
 
     m_goalCombo = new QComboBox(body);
     m_goalCombo->addItem(QStringLiteral("减重"), QStringLiteral("lose"));
     m_goalCombo->addItem(QStringLiteral("增肌"), QStringLiteral("gain"));
     m_goalCombo->addItem(QStringLiteral("维持"), QStringLiteral("maintain"));
-    {
-        const QString g = user.goal.toLower();
-        if (g == QLatin1String("lose"))
-            m_goalCombo->setCurrentIndex(0);
-        else if (g == QLatin1String("gain"))
-            m_goalCombo->setCurrentIndex(1);
-        else
-            m_goalCombo->setCurrentIndex(2);
-    }
+    const QString goal = user.goal.toLower();
+    m_goalCombo->setCurrentIndex(goal == QLatin1String("lose") ? 0
+                                 : goal == QLatin1String("gain") ? 1 : 2);
+    auto *calorieEdit = new QLineEdit(
+        QStringLiteral("%1 kcal").arg(user.calorieTarget > 0 ? user.calorieTarget : 2100), body);
+    calorieEdit->setReadOnly(true);
+
+    auto *formGrid = new QGridLayout;
+    formGrid->setContentsMargins(0, 0, 0, 0);
+    formGrid->setHorizontalSpacing(22);
+    formGrid->setVerticalSpacing(8);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("用户名"), nameEdit), 0, 0);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("性别"), m_genderCombo), 0, 1);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("身高"), m_heightSpin), 1, 0);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("体重"), m_weightSpin), 1, 1);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("健康目标"), m_goalCombo), 2, 0);
+    formGrid->addWidget(fieldBlock(body, QStringLiteral("每日热量目标"), calorieEdit), 2, 1);
+    formGrid->setColumnStretch(0, 1);
+    formGrid->setColumnStretch(1, 1);
+    bodyLay->addLayout(formGrid);
 
     m_prefEdit = new QPlainTextEdit(body);
-    m_prefEdit->setPlaceholderText(QStringLiteral("例如：清淡、少油、高蛋白（可与下方标签互补）"));
     m_prefEdit->setPlainText(user.preferences);
-    m_prefEdit->setFixedHeight(56);
-
-    form->addRow(QStringLiteral("身高"), heightWrap);
-    form->addRow(QStringLiteral("体重"), weightWrap);
-    form->addRow(QStringLiteral("性别"), m_genderCombo);
-    form->addRow(QStringLiteral("目标"), m_goalCombo);
-    form->addRow(QStringLiteral("口味备注"), m_prefEdit);
-
-    m_dietGroup = new TagChipGroup(
-        QStringLiteral("饮食选择"),
-        {QStringLiteral("荤食者"), QStringLiteral("素食者"), QStringLiteral("蛋奶素食者"),
-         QStringLiteral("严格素食者"), QStringLiteral("清真"), QStringLiteral("避免红肉")},
-        body);
+    m_prefEdit->hide();
+    m_dietGroup = new TagChipGroup(QStringLiteral("饮食选择"),
+                                   HealthProfileOptions::dietaryChoices(), body, 6, true);
     m_dietGroup->setSelected(user.dietaryChoices);
-
-    m_intoleranceGroup = new TagChipGroup(
-        QStringLiteral("食物不耐受"),
-        {QStringLiteral("乳糖"), QStringLiteral("麸质"), QStringLiteral("果糖"),
-         QStringLiteral("水杨酸盐"), QStringLiteral("亚硫酸盐"), QStringLiteral("FODMAPs")},
-        body);
+    m_intoleranceGroup = new TagChipGroup(QStringLiteral("食物不耐受"),
+                                          HealthProfileOptions::foodIntolerances(), body, 6, true);
     m_intoleranceGroup->setSelected(user.foodIntolerances);
-
-    m_deficiencyGroup = new TagChipGroup(
-        QStringLiteral("营养缺乏 / 补充目标"),
-        {QStringLiteral("缺铁"), QStringLiteral("缺钙"), QStringLiteral("缺维生素D"),
-         QStringLiteral("缺维生素B12"), QStringLiteral("蛋白质不足")},
-        body);
+    m_deficiencyGroup = new TagChipGroup(QStringLiteral("营养缺乏"),
+                                         HealthProfileOptions::nutritionalDeficiencies(), body, 6,
+                                         true);
     m_deficiencyGroup->setSelected(user.nutritionalDeficiencies);
-
-    m_allergyGroup = new TagChipGroup(
-        QStringLiteral("过敏史"),
-        {QStringLiteral("花生"), QStringLiteral("坚果"), QStringLiteral("鸡蛋"), QStringLiteral("牛奶"),
-         QStringLiteral("海鲜"), QStringLiteral("贝类"), QStringLiteral("大豆"),
-         QStringLiteral("麸质（小麦）"), QStringLiteral("芝麻"), QStringLiteral("猕猴桃")},
-        body);
-    m_allergyGroup->setSelected(user.allergies.isEmpty() ? User::splitLegacyText(user.allergens)
-                                                         : user.allergies);
-
-    m_medicalGroup = new TagChipGroup(
-        QStringLiteral("医疗状况"),
-        {QStringLiteral("2型糖尿病"), QStringLiteral("高血压"), QStringLiteral("高血脂"),
-         QStringLiteral("心血管疾病"), QStringLiteral("肥胖"), QStringLiteral("贫血"),
-         QStringLiteral("肾病")},
-        body);
+    m_allergyGroup = new TagChipGroup(QStringLiteral("过敏史"), HealthProfileOptions::allergies(),
+                                      body, 9, true);
+    m_allergyGroup->setSelected(user.allergies.isEmpty()
+                                    ? User::splitLegacyText(user.allergens) : user.allergies);
+    m_medicalGroup = new TagChipGroup(QStringLiteral("医疗状况"),
+                                      HealthProfileOptions::medicalConditions(), body, 6, true);
     m_medicalGroup->setSelected(user.medicalConditions);
+    for (TagChipGroup *group : {m_dietGroup, m_intoleranceGroup, m_deficiencyGroup,
+                                m_allergyGroup, m_medicalGroup})
+        group->hide();
 
-    bodyLay->addWidget(basicTitle);
-    bodyLay->addLayout(form);
-    bodyLay->addWidget(m_dietGroup);
-    bodyLay->addWidget(m_intoleranceGroup);
-    bodyLay->addWidget(m_deficiencyGroup);
-    bodyLay->addWidget(m_allergyGroup);
-    bodyLay->addWidget(m_medicalGroup);
-    bodyLay->addStretch();
-    scroll->setWidget(body);
+    auto *healthTitle = new QLabel(QStringLiteral("健康状况"), body);
+    healthTitle->setObjectName(QStringLiteral("SettingsSectionTitle"));
+    bodyLay->addWidget(healthTitle);
 
-    auto *hint = new QLabel(
-        QStringLiteral("保存后将重算热量目标；推荐会避开过敏/不耐受关键词，并参考饮食选择与营养目标。"),
-        this);
-    hint->setProperty("class", QVariant(QStringLiteral("HintText")));
-    hint->setWordWrap(true);
+    auto *healthGrid = new QGridLayout;
+    healthGrid->setContentsMargins(0, 0, 0, 0);
+    healthGrid->setHorizontalSpacing(16);
+    healthGrid->setVerticalSpacing(14);
+    auto addHealthCard = [this, body, healthGrid](int row, int column, const QString &caption,
+                                                  const QString &iconName, const QString &tone,
+                                                  TagChipGroup *storage,
+                                                  const QStringList &options,
+                                                  const QString &emptyText) {
+        auto *card = new QFrame(body);
+        card->setProperty("class", QStringLiteral("SettingsHealthTile"));
+        card->setProperty("tone", tone);
+        auto *layout = new QHBoxLayout(card);
+        layout->setContentsMargins(15, 12, 12, 12);
+        layout->setSpacing(12);
+        const QColor color(tone == QStringLiteral("green") ? QStringLiteral("#08A96E")
+                           : tone == QStringLiteral("orange") ? QStringLiteral("#D88931")
+                           : tone == QStringLiteral("blue") ? QStringLiteral("#4B79D8")
+                                                              : QStringLiteral("#735DD1"));
+        auto *icon = UiAssets::createIconLabel(card, iconName, 30, color);
+        auto *copy = new QVBoxLayout;
+        copy->setSpacing(2);
+        auto *titleLabel = new QLabel(caption, card);
+        titleLabel->setObjectName(QStringLiteral("SettingsHealthCaption"));
+        auto *summary = new QLabel(joinOrEmpty(storage->selected(), emptyText), card);
+        summary->setObjectName(QStringLiteral("SettingsHealthValue"));
+        summary->setWordWrap(true);
+        copy->addWidget(titleLabel);
+        copy->addWidget(summary);
+        auto *edit = new QPushButton(card);
+        edit->setProperty("class", QStringLiteral("SettingsHealthEdit"));
+        edit->setFixedSize(38, 38);
+        edit->setToolTip(QStringLiteral("编辑%1").arg(caption));
+        UiAssets::setButtonIcon(edit, QStringLiteral("edit"), 17, color);
+        layout->addWidget(icon);
+        layout->addLayout(copy, 1);
+        layout->addWidget(edit);
+        healthGrid->addWidget(card, row, column);
+        connect(edit, &QPushButton::clicked, this,
+                [this, caption, options, storage, summary, emptyText]() {
+            editHealthTags(this, caption, options, storage, summary, emptyText);
+        });
+    };
+    addHealthCard(0, 0, QStringLiteral("过敏原"), QStringLiteral("shield"),
+                  QStringLiteral("green"), m_allergyGroup, HealthProfileOptions::allergies(),
+                  QStringLiteral("暂无记录"));
+    addHealthCard(0, 1, QStringLiteral("食物不耐受"), QStringLiteral("stomach"),
+                  QStringLiteral("orange"), m_intoleranceGroup,
+                  HealthProfileOptions::foodIntolerances(), QStringLiteral("暂无记录"));
+    addHealthCard(1, 0, QStringLiteral("医疗状况"), QStringLiteral("medical-heart"),
+                  QStringLiteral("blue"), m_medicalGroup,
+                  HealthProfileOptions::medicalConditions(), QStringLiteral("暂无记录"));
+    addHealthCard(1, 1, QStringLiteral("营养缺乏"), QStringLiteral("vitamin"),
+                  QStringLiteral("purple"), m_deficiencyGroup,
+                  HealthProfileOptions::nutritionalDeficiencies(), QStringLiteral("暂无记录"));
+    bodyLay->addLayout(healthGrid);
 
-    auto *buttons = new QDialogButtonBox(this);
-    auto *saveBtn = buttons->addButton(QStringLiteral("保存"), QDialogButtonBox::AcceptRole);
-    auto *cancelBtn = buttons->addButton(QStringLiteral("取消"), QDialogButtonBox::RejectRole);
-    saveBtn->setProperty("class", QVariant(QStringLiteral("PrimaryButton")));
-    cancelBtn->setProperty("class", QVariant(QStringLiteral("GhostButton")));
+    auto *buttons = new QWidget(this);
+    buttons->setObjectName(QStringLiteral("SettingsActions"));
+    auto *buttonLay = new QHBoxLayout(buttons);
+    buttonLay->setContentsMargins(0, 0, 0, 0);
+    buttonLay->setSpacing(12);
+    auto *cancelBtn = new QPushButton(QStringLiteral("取消"), buttons);
+    auto *saveBtn = new QPushButton(QStringLiteral("保存设置"), buttons);
+    cancelBtn->setProperty("class", QStringLiteral("GhostButton"));
+    saveBtn->setProperty("class", QStringLiteral("PrimaryButton"));
+    cancelBtn->setFixedSize(112, 48);
+    saveBtn->setFixedSize(158, 48);
+    buttonLay->addStretch();
+    buttonLay->addWidget(cancelBtn);
+    buttonLay->addWidget(saveBtn);
+    connect(saveBtn, &QPushButton::clicked, this, &SettingsDialog::onSave);
+    connect(cancelBtn, &QPushButton::clicked, this, &QDialog::reject);
 
-    connect(buttons, &QDialogButtonBox::accepted, this, &SettingsDialog::onSave);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
-    root->addWidget(title);
-    root->addWidget(subtitle);
-    root->addWidget(scroll, 1);
-    root->addWidget(hint);
+    root->addWidget(header);
+    root->addWidget(body, 1);
     root->addWidget(buttons);
 }
 
 User SettingsDialog::user() const
 {
     return m_user;
+}
+
+void SettingsDialog::showEvent(QShowEvent *event)
+{
+    QDialog::showEvent(event);
+    setMinimumSize(620, 690);
+    setMaximumSize(620, 690);
+    resize(620, 690);
+    if (QWidget *owner = parentWidget()) {
+        const QRect parentRect = owner->frameGeometry();
+        move(parentRect.center().x() - width() / 2,
+             parentRect.center().y() - height() / 2);
+    }
 }
 
 void SettingsDialog::onSave()
@@ -191,9 +309,8 @@ void SettingsDialog::onSave()
     m_user.allergies = m_allergyGroup->selected();
     m_user.medicalConditions = m_medicalGroup->selected();
     m_user.syncAllergenFields();
-
-    UserService svc;
-    if (!svc.saveUserProfile(m_user)) {
+    UserService service;
+    if (!service.saveUserProfile(m_user)) {
         QMessageBox::warning(this, QStringLiteral("保存失败"),
                              QStringLiteral("无法更新用户档案，请稍后重试。"));
         return;

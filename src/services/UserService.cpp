@@ -5,10 +5,10 @@
 
 double UserService::calculateBMR(const User &user) const
 {
-    // Harris-Benedict (revised), age defaults to 25 when not stored on User
+    // Harris-Benedict (revised), keeping 25 as a safe fallback for legacy profiles.
     const double w = user.weight;
     const double h = user.height;
-    const double age = static_cast<double>(kDefaultAge);
+    const double age = static_cast<double>(user.age > 0 ? user.age : kDefaultAge);
 
     if (user.gender.compare(QStringLiteral("female"), Qt::CaseInsensitive) == 0)
         return 655.1 + (9.563 * w) + (1.850 * h) - (4.676 * age);

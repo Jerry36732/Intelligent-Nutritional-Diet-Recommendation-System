@@ -100,6 +100,7 @@ QJsonObject User::toJson() const
     o.insert(QStringLiteral("goal"), goal);
     o.insert(QStringLiteral("height"), height);
     o.insert(QStringLiteral("weight"), weight);
+    o.insert(QStringLiteral("age"), age);
     o.insert(QStringLiteral("calorieTarget"), calorieTarget);
     o.insert(QStringLiteral("preferences"), preferences);
     o.insert(QStringLiteral("allergens"), allergens);
@@ -128,6 +129,7 @@ void User::fromJson(const QJsonObject &obj)
     goal = obj.value(QStringLiteral("goal")).toString(goal);
     height = obj.value(QStringLiteral("height")).toDouble(height);
     weight = obj.value(QStringLiteral("weight")).toDouble(weight);
+    age = obj.value(QStringLiteral("age")).toInt(age);
     calorieTarget = obj.value(QStringLiteral("calorieTarget")).toInt(calorieTarget);
     preferences = obj.value(QStringLiteral("preferences")).toString(preferences);
     allergens = obj.value(QStringLiteral("allergens")).toString(allergens);

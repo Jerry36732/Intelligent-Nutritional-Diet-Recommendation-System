@@ -9,6 +9,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QPlainTextEdit;
 class TagChipGroup;
+class QShowEvent;
 
 class SettingsDialog : public QDialog
 {
@@ -23,6 +24,8 @@ private slots:
     void onSave();
 
 private:
+    void showEvent(QShowEvent *event) override;
+
     User m_user;
     QDoubleSpinBox *m_heightSpin = nullptr;
     QDoubleSpinBox *m_weightSpin = nullptr;

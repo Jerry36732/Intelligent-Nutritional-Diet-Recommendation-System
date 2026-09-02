@@ -1,12 +1,16 @@
 #include "DashboardWidget.h"
 #include "RecipeCard.h"
+#include "UiAssets.h"
 
 #include "../dao/RecipeDAO.h"
 #include "../services/UserService.h"
 
 #include <QFrame>
+#include <QConicalGradient>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -20,111 +24,251 @@ QString goalToCn(const QString &goal)
         return QStringLiteral("增肌");
     return QStringLiteral("维持");
 }
+
+class CalorieRing final : public QWidget
+{
+public:
+    explicit CalorieRing(QWidget *parent = nullptr) : QWidget(parent)
+    {
+        setFixedSize(140, 140);
+        setProperty("progress", 0.0);
+    }
+protected:
+    void paintEvent(QPaintEvent *) override
+    {
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing, true);
+        const QRectF ring = QRectF(rect()).adjusted(10, 10, -10, -10);
+        QPen base(QColor(QStringLiteral("#E9ECEB")), 10, Qt::SolidLine, Qt::FlatCap);
+        p.setPen(base);
+        p.drawArc(ring, 0, 360 * 16);
+        QConicalGradient progressGradient(ring.center(), -90.0);
+        progressGradient.setColorAt(0.00, QColor(QStringLiteral("#059669")));
+        progressGradient.setColorAt(0.45, QColor(QStringLiteral("#10B981")));
+        progressGradient.setColorAt(0.72, QColor(QStringLiteral("#35C98A")));
+        progressGradient.setColorAt(1.00, QColor(QStringLiteral("#0891B2")));
+        QPen active(QBrush(progressGradient), 10, Qt::SolidLine, Qt::RoundCap);
+        p.setPen(active);
+        const qreal progress = qBound<qreal>(0.0, property("progress").toDouble(), 1.0);
+        p.drawArc(ring, 90 * 16, -qRound(360.0 * 16.0 * progress));
+    }
+};
 } // namespace
 
 DashboardWidget::DashboardWidget(QWidget *parent)
     : QWidget(parent)
 {
     auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(24, 20, 24, 20);
-    root->setSpacing(16);
-
-    auto *topRow = new QHBoxLayout;
-    auto *heroCol = new QVBoxLayout;
-    heroCol->setSpacing(8);
-    auto *eyebrow = new QLabel(QStringLiteral("DAILY PLAN · 今日方案"), this);
-    eyebrow->setObjectName(QStringLiteral("SectionKicker"));
-    m_welcomeLabel = new QLabel(QStringLiteral("把今天的每一口，\n吃成靠近目标的样子。"), this);
-    m_welcomeLabel->setObjectName(QStringLiteral("DashboardHeroTitle"));
-    m_welcomeLabel->setWordWrap(true);
-    auto *sub = new QLabel(QStringLiteral("根据你的身体数据与目标，系统已准备好今日三餐。"), this);
-    sub->setObjectName(QStringLiteral("DashboardSubcopy"));
-    heroCol->addWidget(eyebrow);
-    heroCol->addWidget(m_welcomeLabel);
-    heroCol->addWidget(sub);
+    root->setContentsMargins(25, 12, 28, 9);
+    root->setSpacing(7);
 
     auto *regenBtn = new QPushButton(QStringLiteral("重新生成方案"), this);
     regenBtn->setCursor(Qt::PointingHandCursor);
     regenBtn->setProperty("class", QVariant(QStringLiteral("PrimaryButton")));
 
-    auto *settingsBtn = new QPushButton(QStringLiteral("调整目标"), this);
-    settingsBtn->setCursor(Qt::PointingHandCursor);
-    settingsBtn->setProperty("class", QVariant(QStringLiteral("GhostButton")));
+    regenBtn->setObjectName(QStringLiteral("DashboardRegenButton"));
+    UiAssets::setButtonIcon(regenBtn, QStringLiteral("regenerate"), 20, QColor(Qt::white));
 
-    topRow->addLayout(heroCol, 1);
-    topRow->addStretch();
-    auto *btnCol = new QVBoxLayout;
-    btnCol->addStretch();
-    btnCol->addWidget(settingsBtn);
-    btnCol->addWidget(regenBtn);
-    topRow->addLayout(btnCol);
+    auto *overview = new QWidget(this);
+    overview->setObjectName(QStringLiteral("DashboardOverview"));
+    overview->setFixedHeight(159);
+    auto *overviewLay = new QHBoxLayout(overview);
+    overviewLay->setContentsMargins(0, 0, 0, 0);
+    overviewLay->setSpacing(16);
 
-    auto *metrics = new QFrame(this);
-    metrics->setObjectName(QStringLiteral("MetricStrip"));
-    auto *metricsLay = new QHBoxLayout(metrics);
-    metricsLay->setContentsMargins(20, 16, 20, 16);
-    metricsLay->setSpacing(0);
+    auto *calorieCard = new QFrame(overview);
+    calorieCard->setObjectName(QStringLiteral("CalorieOverviewCard"));
+    auto *calorieLay = new QHBoxLayout(calorieCard);
+    calorieLay->setContentsMargins(16, 7, 18, 7);
+    calorieLay->setSpacing(32);
+    auto *calorieLeaves = new QLabel(calorieCard);
+    calorieLeaves->setAttribute(Qt::WA_TransparentForMouseEvents);
+    calorieLeaves->setFixedSize(98, 112);
+    calorieLeaves->setPixmap(UiAssets::svgPixmap(
+        QStringLiteral("leaf-watermark"), QSize(98, 112), QColor(), calorieLeaves));
+    calorieLeaves->move(240, 47);
+    calorieLeaves->lower();
+    auto *ringHost = new QWidget(calorieCard);
+    ringHost->setFixedSize(140, 140);
+    auto *ring = new CalorieRing(ringHost);
+    ring->setGeometry(0, 0, 124, 124);
+    m_calorieRing = ring;
+    auto *ringText = new QWidget(ringHost);
+    ringText->setGeometry(0, 0, 124, 124);
+    m_kcalValue = new QLabel(QStringLiteral("—"), ringText);
+    m_kcalValue->setObjectName(QStringLiteral("MetricKcal"));
+    m_kcalValue->setAlignment(Qt::AlignCenter);
+    m_kcalValue->setGeometry(8, 35, 108, 46);
+    auto *kcalUnit = new QLabel(QStringLiteral("kcal"), ringText);
+    kcalUnit->setObjectName(QStringLiteral("RingUnit"));
+    kcalUnit->setAlignment(Qt::AlignCenter);
+    kcalUnit->setGeometry(8, 81, 108, 21);
+    ringText->raise();
 
-    auto addMetric = [&](QLabel **valueOut, const QString &label) {
-        auto *box = new QVBoxLayout;
-        box->setSpacing(4);
-        auto *v = new QLabel(QStringLiteral("—"), metrics);
-        v->setProperty("class", QVariant(QStringLiteral("MetricValue")));
-        v->setAlignment(Qt::AlignCenter);
-        auto *l = new QLabel(label, metrics);
-        l->setProperty("class", QVariant(QStringLiteral("MetricLabel")));
-        l->setAlignment(Qt::AlignCenter);
-        box->addWidget(v);
-        box->addWidget(l);
-        metricsLay->addLayout(box, 1);
-        *valueOut = v;
+    auto *complete = new QVBoxLayout;
+    complete->setSpacing(5);
+    auto *todayLabel = new QLabel(QStringLiteral("今日方案热量"), calorieCard);
+    todayLabel->setObjectName(QStringLiteral("OverviewCaption"));
+    todayLabel->setToolTip(QStringLiteral(
+        "这里显示早餐、午餐和晚餐中全部推荐菜品的热量之和，不代表实际摄入。"));
+    auto *doneLabel = new QLabel(QStringLiteral("占每日目标"), calorieCard);
+    doneLabel->setObjectName(QStringLiteral("OverviewSubCaption"));
+    m_completionValue = new QLabel(QStringLiteral("0%"), calorieCard);
+    m_completionValue->setObjectName(QStringLiteral("CompletionValue"));
+    m_completionDetail = new QLabel(QStringLiteral("0 / 0 kcal"), calorieCard);
+    m_completionDetail->setObjectName(QStringLiteral("CompletionDetail"));
+    m_completionDetail->setWordWrap(true);
+    complete->addStretch();
+    complete->addWidget(todayLabel);
+    complete->addSpacing(7);
+    complete->addWidget(doneLabel);
+    complete->addWidget(m_completionValue);
+    complete->addWidget(m_completionDetail);
+    complete->addStretch();
+    calorieLay->addWidget(ringHost);
+    calorieLay->addLayout(complete, 1);
 
-        auto *div = new QFrame(metrics);
-        div->setProperty("class", QVariant(QStringLiteral("MetricDivider")));
-        div->setFrameShape(QFrame::VLine);
-        metricsLay->addWidget(div);
+    auto makeStatusCard = [&](const QString &caption, const QString &iconName,
+                              const QString &tone, const QString &note, QLabel **valueOut,
+                              QLabel **noteOut = nullptr) {
+        auto *card = new QFrame(overview);
+        card->setObjectName(QStringLiteral("DashboardStatusCard"));
+        card->setProperty("tone", tone);
+        auto *outer = new QVBoxLayout(card);
+        outer->setContentsMargins(14, 16, 14, 12);
+        outer->setSpacing(0);
+        auto *lay = new QHBoxLayout;
+        lay->setContentsMargins(0, 0, 0, 0);
+        lay->setSpacing(10);
+        auto *icon = new QLabel(card);
+        icon->setObjectName(QStringLiteral("DashboardStatusIcon"));
+        icon->setProperty("tone", tone);
+        icon->setAlignment(Qt::AlignCenter);
+        icon->setFixedSize(44, 44);
+        const QColor iconColor(tone == QStringLiteral("green") ? QStringLiteral("#059669")
+                                                                 : QStringLiteral("#0891B2"));
+        icon->setPixmap(UiAssets::svgPixmap(iconName, QSize(24, 24), iconColor, icon));
+        auto *copy = new QVBoxLayout;
+        copy->setSpacing(0);
+        auto *label = new QLabel(caption, card);
+        label->setObjectName(QStringLiteral("DashboardStatusCaption"));
+        auto *value = new QLabel(QStringLiteral("—"), card);
+        value->setObjectName(QStringLiteral("DashboardStatusValue"));
+        value->setProperty("tone", tone);
+        copy->addWidget(label);
+        copy->addWidget(value);
+        lay->addWidget(icon);
+        lay->addLayout(copy, 1);
+        outer->addLayout(lay);
+        outer->addSpacing(14);
+        auto *rule = new QFrame(card);
+        rule->setObjectName(QStringLiteral("DashboardStatusRule"));
+        rule->setFixedHeight(1);
+        outer->addWidget(rule);
+        outer->addSpacing(7);
+        auto *noteLabel = new QLabel(note, card);
+        noteLabel->setObjectName(QStringLiteral("DashboardStatusNote"));
+        noteLabel->setProperty("tone", tone);
+        noteLabel->setWordWrap(true);
+        noteLabel->setMinimumHeight(30);
+        noteLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        outer->addWidget(noteLabel);
+        outer->addStretch();
+        *valueOut = value;
+        if (noteOut)
+            *noteOut = noteLabel;
+        return card;
     };
+    auto *goalCard = makeStatusCard(QStringLiteral("当前目标"), QStringLiteral("target"),
+                                    QStringLiteral("green"),
+                                    QStringLiteral("建议热量：— kcal/天"), &m_goalValue,
+                                    &m_goalNote);
+    auto *bmiCard = makeStatusCard(QStringLiteral("BMI"), QStringLiteral("bmi-user"),
+                                   QStringLiteral("blue"), QStringLiteral("健康"), &m_bmiValue);
+    m_bmiValue->setFont(UiAssets::bodyFont(20, QFont::DemiBold));
+    // 维持 V6 的 338:184:210 比例，窗口变宽时三个卡片一起伸展，
+    // 避免 BMI 单卡吸收全部剩余宽度而破坏参考图布局。
+    overviewLay->addWidget(calorieCard, 338);
+    overviewLay->addWidget(goalCard, 184);
+    overviewLay->addWidget(bmiCard, 210);
 
-    addMetric(&m_kcalValue, QStringLiteral("热量目标 kcal"));
-    addMetric(&m_goalValue, QStringLiteral("饮食目标"));
-    addMetric(&m_bmiValue, QStringLiteral("BMI"));
-    addMetric(&m_completionValue, QStringLiteral("今日完成度"));
-    // remove last divider
-    if (QLayoutItem *last = metricsLay->takeAt(metricsLay->count() - 1)) {
-        if (QWidget *w = last->widget())
-            w->deleteLater();
-        delete last;
-    }
-
-    auto *cardsRow = new QHBoxLayout;
-    cardsRow->setSpacing(14);
+    auto *cardsHost = new QWidget(this);
+    cardsHost->setObjectName(QStringLiteral("MealCardsHost"));
+    cardsHost->setFixedHeight(289);
+    auto *cardsRow = new QHBoxLayout(cardsHost);
+    cardsRow->setContentsMargins(0, 0, 0, 0);
+    cardsRow->setSpacing(12);
     m_breakfastCard = new RecipeCard(this);
     m_lunchCard = new RecipeCard(this);
     m_dinnerCard = new RecipeCard(this);
+    for (RecipeCard *card : {m_breakfastCard, m_lunchCard, m_dinnerCard})
+        card->setFixedHeight(289);
     cardsRow->addWidget(m_breakfastCard, 1);
     cardsRow->addWidget(m_lunchCard, 1);
     cardsRow->addWidget(m_dinnerCard, 1);
 
-    m_summaryLabel = new QLabel(this);
-    m_summaryLabel->setWordWrap(true);
-    m_summaryLabel->setProperty("class", QVariant(QStringLiteral("HintText")));
+    auto *summary = new QFrame(this);
+    summary->setObjectName(QStringLiteral("DailySummaryBar"));
+    summary->setFixedHeight(83);
+    auto *summaryLayout = new QHBoxLayout(summary);
+    summaryLayout->setContentsMargins(16, 8, 14, 8);
+    summaryLayout->setSpacing(0);
+    auto makeSummaryMetric = [summary](const QString &caption, const QString &tone,
+                                       const QString &iconName,
+                                       QLabel **valueOut) {
+        auto *host = new QWidget(summary);
+        host->setProperty("class", QStringLiteral("DailySummaryMetric"));
+        host->setProperty("tone", tone);
+        auto *layout = new QHBoxLayout(host);
+        layout->setContentsMargins(10, 3, 10, 3);
+        layout->setSpacing(8);
+        const QColor iconColor(tone == QStringLiteral("green") ? QStringLiteral("#08A96E")
+                                : tone == QStringLiteral("orange") ? QStringLiteral("#0793C7")
+                                                                    : QStringLiteral("#0A8BC1"));
+        auto *icon = UiAssets::createIconLabel(host, iconName, 22, iconColor);
+        icon->setObjectName(QStringLiteral("DailySummaryIcon"));
+        icon->setProperty("tone", tone);
+        auto *copy = new QVBoxLayout;
+        copy->setSpacing(2);
+        auto *captionLabel = new QLabel(caption, host);
+        captionLabel->setObjectName(QStringLiteral("DailySummaryCaption"));
+        auto *value = new QLabel(QStringLiteral("—"), host);
+        value->setObjectName(QStringLiteral("DailySummaryValue"));
+        value->setProperty("tone", tone);
+        copy->addWidget(captionLabel);
+        copy->addWidget(value);
+        layout->addWidget(icon);
+        layout->addLayout(copy, 1);
+        *valueOut = value;
+        return host;
+    };
+    summaryLayout->addWidget(makeSummaryMetric(QStringLiteral("今日营养总计"),
+                                                QStringLiteral("green"),
+                                                QStringLiteral("leaf"),
+                                                &m_totalSummaryValue), 5);
+    summaryLayout->addWidget(makeSummaryMetric(QStringLiteral("蛋白质"),
+                                                QStringLiteral("blue"),
+                                                QStringLiteral("protein"),
+                                                &m_proteinSummaryValue), 4);
+    summaryLayout->addWidget(makeSummaryMetric(QStringLiteral("碳水化合物"),
+                                                QStringLiteral("orange"),
+                                                QStringLiteral("grain"),
+                                                &m_carbsSummaryValue), 4);
+    summaryLayout->addWidget(makeSummaryMetric(QStringLiteral("脂肪"),
+                                                QStringLiteral("purple"),
+                                                QStringLiteral("flame"),
+                                                &m_fatSummaryValue), 4);
+    summaryLayout->addWidget(regenBtn);
+    regenBtn->setFixedSize(155, 49);
 
-    auto *tip = new QFrame(this);
-    tip->setObjectName(QStringLiteral("RuleCard"));
-    auto *tipLay = new QHBoxLayout(tip);
-    tipLay->setContentsMargins(14, 12, 14, 12);
-    auto *tipLetter = new QLabel(QStringLiteral("衡"), tip);
-    tipLetter->setProperty("class", QVariant(QStringLiteral("RuleLetter")));
-    auto *tipText = new QLabel(
-        QStringLiteral("膳衡原则：热量守恒、蛋白优先、三餐平衡。生成方案后可收藏并在档案页回看。"),
-        tip);
-    tipText->setWordWrap(true);
-    tipText->setProperty("class", QVariant(QStringLiteral("HintText")));
-    tipLay->addWidget(tipLetter, 0, Qt::AlignTop);
-    tipLay->addWidget(tipText, 1);
+    auto *tip = new QLabel(
+        QStringLiteral("膳衡原则：热量守恒、蛋白优先、三餐平衡。生成方案后可在食谱详情中收藏。"),
+        this);
+    tip->setObjectName(QStringLiteral("DailyRuleHint"));
+    tip->setWordWrap(true);
+    tip->setFixedHeight(24);
 
     connect(regenBtn, &QPushButton::clicked, this, &DashboardWidget::regenerateRequested);
-    connect(settingsBtn, &QPushButton::clicked, this, &DashboardWidget::openSettingsRequested);
 
     for (RecipeCard *card : {m_breakfastCard, m_lunchCard, m_dinnerCard}) {
         connect(card, &RecipeCard::detailClicked, this, &DashboardWidget::detailRequested);
@@ -132,22 +276,39 @@ DashboardWidget::DashboardWidget(QWidget *parent)
         connect(card, &RecipeCard::favoriteToggled, this, &DashboardWidget::favoriteToggled);
     }
 
-    root->addLayout(topRow);
-    root->addWidget(metrics);
-    root->addLayout(cardsRow, 1);
-    root->addWidget(m_summaryLabel);
+    root->addWidget(overview);
+    root->addWidget(cardsHost);
+    root->addSpacing(6);
+    root->addWidget(summary);
     root->addWidget(tip);
 }
 
 void DashboardWidget::setUser(const User &user)
 {
     m_user = user;
-    m_welcomeLabel->setText(QStringLiteral("把今天的每一口，\n吃成靠近目标的样子。"));
-    if (QLabel *sub = findChild<QLabel *>(QStringLiteral("DashboardSubcopy"))) {
-        sub->setText(QStringLiteral("早安，%1。根据你的身体数据，今天适合保持稳定的能量摄入。")
-                         .arg(user.name.isEmpty() ? QStringLiteral("朋友") : user.name));
+    if (m_goalNote) {
+        UserService service;
+        const int target = m_user.calorieTarget > 0
+            ? m_user.calorieTarget : service.calculateDailyCalories(m_user);
+        const int recalculated = service.calculateDailyCalories(m_user);
+        m_goalNote->setText(QStringLiteral("每日目标：%1 kcal/天").arg(target));
+        if (m_adaptiveTarget.enoughData) {
+            m_goalNote->setText(QStringLiteral("动态目标：%1 kcal/天").arg(target));
+            m_goalNote->setToolTip(m_adaptiveTarget.explanation);
+        } else {
+            m_goalNote->setToolTip(QStringLiteral(
+                "当前采用档案保存值 %1 kcal/天。档案更新时按“基础代谢 × 活动系数1.55 × "
+                "目标修正 × 医疗修正”估算；按当前资料重新计算约为 %2 kcal/天。")
+                                       .arg(target)
+                                       .arg(recalculated));
+        }
     }
     updateMetrics();
+}
+
+void DashboardWidget::setAdaptiveTarget(const AdaptiveTargetResult &result)
+{
+    m_adaptiveTarget = result;
 }
 
 void DashboardWidget::setPlan(const RecommendResult &plan)
@@ -157,16 +318,49 @@ void DashboardWidget::setPlan(const RecommendResult &plan)
         m_breakfastCard->setMeal(plan.breakfast);
         m_lunchCard->setMeal(plan.lunch);
         m_dinnerCard->setMeal(plan.dinner);
-        m_summaryLabel->setText(plan.summary);
-        m_completionValue->setText(QStringLiteral("100%"));
+        const double breakfastKcal = plan.breakfast.totalCalories();
+        const double lunchKcal = plan.lunch.totalCalories();
+        const double dinnerKcal = plan.dinner.totalCalories();
+        const double kcal = breakfastKcal + lunchKcal + dinnerKcal;
+        const double protein = plan.breakfast.totalProtein() + plan.lunch.totalProtein()
+                               + plan.dinner.totalProtein();
+        const double carbs = plan.breakfast.totalCarbs() + plan.lunch.totalCarbs()
+                             + plan.dinner.totalCarbs();
+        const double fat = plan.breakfast.totalFat() + plan.lunch.totalFat()
+                           + plan.dinner.totalFat();
+        m_kcalValue->setText(QString::number(qRound(kcal)));
+        m_totalSummaryValue->setText(QStringLiteral("%1 kcal").arg(kcal, 0, 'f', 0));
+        m_proteinSummaryValue->setText(QStringLiteral("%1 g").arg(protein, 0, 'f', 1));
+        m_carbsSummaryValue->setText(QStringLiteral("%1 g").arg(carbs, 0, 'f', 1));
+        m_fatSummaryValue->setText(QStringLiteral("%1 g").arg(fat, 0, 'f', 1));
+        UserService service;
+        const double target = qMax(1, m_user.calorieTarget > 0
+                                          ? m_user.calorieTarget
+                                          : service.calculateDailyCalories(m_user));
+        const int percent = qBound(0, qRound(kcal / target * 100.0), 999);
+        m_completionValue->setText(QStringLiteral("%1%").arg(percent));
+        m_completionDetail->setText(QStringLiteral("目标 %1 kcal").arg(qRound(target)));
+        m_completionDetail->setToolTip(QStringLiteral(
+            "今日方案热量 = 早餐全部菜品 + 午餐全部菜品 + 晚餐全部菜品；实际摄入请查看饮食分析。"));
+        m_kcalValue->setToolTip(m_completionDetail->toolTip());
+        m_calorieRing->setProperty("progress", qMin(1.0, kcal / target));
+        m_calorieRing->update();
     } else {
         m_breakfastCard->clear();
         m_lunchCard->clear();
         m_dinnerCard->clear();
-        m_summaryLabel->setText(plan.summary.isEmpty()
-                                    ? QStringLiteral("尚未生成方案，点击「重新生成方案」开始。")
-                                    : plan.summary);
+        m_totalSummaryValue->setText(QStringLiteral("待生成"));
+        m_proteinSummaryValue->setText(QStringLiteral("—"));
+        m_carbsSummaryValue->setText(QStringLiteral("—"));
+        m_fatSummaryValue->setText(QStringLiteral("—"));
         m_completionValue->setText(QStringLiteral("0%"));
+        UserService service;
+        const int target = m_user.calorieTarget > 0
+            ? m_user.calorieTarget : service.calculateDailyCalories(m_user);
+        m_completionDetail->setText(QStringLiteral("尚未生成三餐方案\n目标 %1 kcal").arg(target));
+        m_calorieRing->setProperty("progress", 0.0);
+        m_calorieRing->update();
+        updateMetrics();
     }
     if (m_user.id > 0)
         refreshFavorites(m_user.id);
@@ -190,11 +384,20 @@ void DashboardWidget::updateMetrics()
 {
     UserService svc;
     m_kcalValue->setObjectName(QStringLiteral("MetricKcal"));
-    m_kcalValue->setText(QString::number(m_user.calorieTarget > 0
-                                             ? m_user.calorieTarget
-                                             : svc.calculateDailyCalories(m_user)));
+    if (m_plan.valid) {
+        const double actualKcal = m_plan.breakfast.totalCalories() + m_plan.lunch.totalCalories()
+                                  + m_plan.dinner.totalCalories();
+        m_kcalValue->setText(QString::number(qRound(actualKcal)));
+    } else {
+        m_kcalValue->setText(QStringLiteral("—"));
+    }
     m_goalValue->setText(goalToCn(m_user.goal));
     m_bmiValue->setText(QString::number(svc.calculateBMI(m_user), 'f', 1));
     if (!m_plan.valid)
         m_completionValue->setText(QStringLiteral("0%"));
+    if (!m_plan.valid && m_completionDetail)
+        m_completionDetail->setText(QStringLiteral("尚未生成三餐方案\n目标 %1 kcal")
+                                        .arg(m_user.calorieTarget > 0
+                                                 ? m_user.calorieTarget
+                                                 : svc.calculateDailyCalories(m_user)));
 }

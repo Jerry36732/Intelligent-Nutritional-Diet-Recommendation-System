@@ -5,9 +5,13 @@
 #include "../entities/RecommendResult.h"
 
 #include <QFrame>
+#include <QHash>
 
 class QLabel;
 class QPushButton;
+class QGridLayout;
+class QMouseEvent;
+class QEvent;
 
 class RecipeCard : public QFrame
 {
@@ -29,19 +33,25 @@ signals:
     void mealDetailRequested(const MealSlot &meal);
     void favoriteToggled(int recipeId);
 
+protected:
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
-    void rebuildNutrients();
+    void rebuildDishes();
+    void rebuildSummary();
     void applyMealUi();
 
     MealSlot m_meal;
     QLabel *m_mealTag = nullptr;
-    QLabel *m_nameLabel = nullptr;
-    QLabel *m_metaLabel = nullptr;
-    QLabel *m_proteinChip = nullptr;
-    QLabel *m_carbsChip = nullptr;
-    QLabel *m_fatChip = nullptr;
+    QLabel *m_mealIcon = nullptr;
+    QLabel *m_ratioLabel = nullptr;
+    QLabel *m_totalKcalLabel = nullptr;
+    QLabel *m_summaryLabel = nullptr;
+    QGridLayout *m_dishLayout = nullptr;
     QPushButton *m_detailBtn = nullptr;
     QPushButton *m_favBtn = nullptr;
+    QHash<QObject *, Recipe> m_rowRecipes;
 };
 
 #endif // RECIPECARD_H

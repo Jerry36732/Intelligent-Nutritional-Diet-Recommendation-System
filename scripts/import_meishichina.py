@@ -177,6 +177,12 @@ def classify_role(name: str, default: str) -> str:
 
     if any(k in name for k in drink_kw):
         return "drink"
+    if "肉饼" in name or "海鲜饼" in name:
+        return "meat"
+    if "土豆饼" in name or "香椿饼" in name:
+        return "vegetable"
+    if "松饼" in name or "蛋糕" in name:
+        return "dessert"
     if any(k in name for k in breakfast_kw) and default in {"breakfast", "mixed"}:
         return "breakfast"
     if any(k in name for k in soup_kw):
@@ -272,6 +278,15 @@ def upsert_recipe(conn: sqlite3.Connection, recipe: ScrapedRecipe, food_index) -
         "SELECT id FROM recipes WHERE source_url = ? OR (name = ? AND ifnull(source,'') = 'meishichina')",
         (recipe.url, recipe.name),
     ).fetchone()
+    if not existing:
+        # 公共库同名食谱以现有审核记录为准；网页导入不再制造第二份同名卡片。
+        public_same_name = conn.execute(
+            "SELECT id FROM recipes WHERE name=? "
+            "AND IFNULL(source_ref,'') NOT LIKE 'USER:%' LIMIT 1",
+            (recipe.name,),
+        ).fetchone()
+        if public_same_name:
+            return False
     cal, p, c, f, linked = estimate_nutrition(recipe.ingredients, food_index)
     steps = recipe.steps
     if recipe.ingredients:

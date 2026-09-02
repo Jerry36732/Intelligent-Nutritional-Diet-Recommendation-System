@@ -3,17 +3,19 @@
 
 #include <QWidget>
 
-// A small original mark: a bowl-shaped plate cradling two sprouting leaves.
-// It stays crisp at any desktop DPI without needing an external image asset.
+// Canonical renderer for the approved full brand lock-up.  Every screen uses this
+// one component so the mark, Chinese name and English subtitle cannot drift apart.
 class LogoWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     explicit LogoWidget(QWidget *parent = nullptr);
+    QSize sizeHint() const override;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+
 };
 
 #endif // LOGOWIDGET_H

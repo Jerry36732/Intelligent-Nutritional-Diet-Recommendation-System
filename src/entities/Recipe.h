@@ -9,6 +9,7 @@ struct RecipeIngredient
 {
     QString foodName;
     double quantity = 0.0;
+    QString quantityText; // 例如“4根约400g”；营养计算仍使用 quantity 克数
 };
 
 struct Recipe
@@ -16,7 +17,7 @@ struct Recipe
     int id = 0;
     QString name;
     QString category;        // 早餐 / 午餐 / 晚餐
-    QString dishRole;        // breakfast / staple / meat / vegetable / soup / mixed
+    QString dishRole;        // breakfast / staple / meat / vegetable / soup / dessert / snack / mixed / drink
     QString steps;
     int cookMinutes = 0;
     QString accent;

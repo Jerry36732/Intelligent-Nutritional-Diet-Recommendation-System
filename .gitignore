@@ -114,6 +114,28 @@ report_content/
 __pycache__/
 .venv/
 
+# Codex 与本地制作过程缓存
+/.codex/
+/.codex_*/
+/ui-review/
+/worklog-output/
+
+# 本地验收、汇报与版面制作产物（正式交付文件另行保存）
+/AI交互报告_完成版/
+/版面设计v2/
+/美化效果图/
+/设计比对/
+/项目文档/
+/项目结项材料_*/
+/智能营养膳食推荐系统_中期汇报_*/
+/验收截图/
+*.pptx
+*.pptx.inspect.ndjson
+
+# 数据库审计工作副本与修改前备份
+data/diet_before_*.db
+data/*_audit_work.db
+
 
 scripts/*.txt
 scripts/*.html

@@ -1,8 +1,13 @@
+param(
+    [string]$DocumentPath = "C:\Users\ROG\Documents\System\食谱数据\智能营养膳食推荐系统_食谱数据手册.docx",
+    [string]$OutputDirectory = "C:\Users\ROG\Documents\System\食谱数据\rendered_word"
+)
+
 $ErrorActionPreference = "Stop"
-$docx = "C:\Users\ROG\Documents\System\食谱数据\智能营养膳食推荐系统_食谱数据手册.docx"
-$outDir = "C:\Users\ROG\Documents\System\食谱数据\rendered_word"
+$docx = (Resolve-Path -LiteralPath $DocumentPath).Path
+$outDir = $OutputDirectory
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-$pdf = Join-Path $outDir "食谱数据手册.pdf"
+$pdf = Join-Path $outDir (([System.IO.Path]::GetFileNameWithoutExtension($docx)) + ".pdf")
 $word = New-Object -ComObject Word.Application
 $word.Visible = $false
 try {

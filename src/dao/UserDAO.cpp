@@ -27,6 +27,7 @@ User UserDAO::mapRow(const QSqlQuery &query) const
     u.goal = query.value(QStringLiteral("goal")).toString();
     u.height = query.value(QStringLiteral("height")).toDouble();
     u.weight = query.value(QStringLiteral("weight")).toDouble();
+    u.age = query.value(QStringLiteral("age")).toInt();
     u.calorieTarget = query.value(QStringLiteral("calorie_target")).toInt();
     u.passwordHash = query.value(QStringLiteral("password_hash")).toString();
     u.preferences = query.value(QStringLiteral("preferences")).toString();
@@ -43,7 +44,7 @@ User UserDAO::mapRow(const QSqlQuery &query) const
 }
 
 static const char *kUserSelectCols =
-    "id, name, gender, goal, height, weight, calorie_target, password_hash, "
+    "id, name, gender, goal, height, weight, IFNULL(age,25) AS age, calorie_target, password_hash, "
     "IFNULL(preferences,'') AS preferences, IFNULL(allergens,'') AS allergens, "
     "IFNULL(dietary_choices,'[]') AS dietary_choices, "
     "IFNULL(food_intolerances,'[]') AS food_intolerances, "
@@ -68,10 +69,10 @@ bool UserDAO::insertUser(const User &user)
 
     QSqlQuery q(db);
     q.prepare(QStringLiteral(
-        "INSERT INTO users (name, gender, goal, height, weight, calorie_target, password_hash, "
+        "INSERT INTO users (name, gender, goal, height, weight, age, calorie_target, password_hash, "
         "preferences, allergens, dietary_choices, food_intolerances, nutritional_deficiencies, "
         "allergies, medical_conditions) "
-        "VALUES (:name, :gender, :goal, :height, :weight, :calorie_target, :password_hash, "
+        "VALUES (:name, :gender, :goal, :height, :weight, :age, :calorie_target, :password_hash, "
         ":preferences, :allergens, :dietary_choices, :food_intolerances, :nutritional_deficiencies, "
         ":allergies, :medical_conditions)"));
     q.bindValue(QStringLiteral(":name"), u.name);
@@ -79,6 +80,7 @@ bool UserDAO::insertUser(const User &user)
     q.bindValue(QStringLiteral(":goal"), u.goal);
     q.bindValue(QStringLiteral(":height"), u.height);
     q.bindValue(QStringLiteral(":weight"), u.weight);
+    q.bindValue(QStringLiteral(":age"), u.age);
     q.bindValue(QStringLiteral(":calorie_target"), u.calorieTarget);
     q.bindValue(QStringLiteral(":password_hash"), u.passwordHash);
     q.bindValue(QStringLiteral(":preferences"), u.preferences);
@@ -120,7 +122,7 @@ bool UserDAO::updateUser(const User &user)
     QSqlQuery q(db);
     q.prepare(QStringLiteral(
         "UPDATE users SET name = :name, gender = :gender, goal = :goal, "
-        "height = :height, weight = :weight, calorie_target = :calorie_target, "
+        "height = :height, weight = :weight, age = :age, calorie_target = :calorie_target, "
         "password_hash = COALESCE(NULLIF(:password_hash, ''), password_hash), "
         "preferences = :preferences, allergens = :allergens, "
         "dietary_choices = :dietary_choices, food_intolerances = :food_intolerances, "
@@ -132,6 +134,7 @@ bool UserDAO::updateUser(const User &user)
     q.bindValue(QStringLiteral(":goal"), u.goal);
     q.bindValue(QStringLiteral(":height"), u.height);
     q.bindValue(QStringLiteral(":weight"), u.weight);
+    q.bindValue(QStringLiteral(":age"), u.age);
     q.bindValue(QStringLiteral(":calorie_target"), u.calorieTarget);
     q.bindValue(QStringLiteral(":password_hash"), u.passwordHash);
     q.bindValue(QStringLiteral(":preferences"), u.preferences);

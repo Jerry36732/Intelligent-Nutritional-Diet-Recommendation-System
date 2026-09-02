@@ -114,8 +114,8 @@ Recipe RecommendEngine::pickOne(const QList<Recipe> &candidates,
     };
     QVector<Scored> pool;
     pool.reserve(candidates.size());
-    const double lo = targetCal * 0.55;
-    const double hi = targetCal * 1.55;
+    const double lo = targetCal * 0.35;
+    const double hi = targetCal * 1.35;
 
     for (const Recipe &r : candidates) {
         if (!r.isValid() || excludeIds.contains(r.id))
@@ -152,7 +152,7 @@ Recipe RecommendEngine::pickOne(const QList<Recipe> &candidates,
     std::sort(pool.begin(), pool.end(), [](const Scored &a, const Scored &b) {
         return a.score > b.score;
     });
-    const int topN = qMin(6, pool.size());
+    const int topN = qMin(3, pool.size());
     const int pick = QRandomGenerator::global()->bounded(topN);
     if (outScore)
         *outScore = pool[pick].score;
@@ -211,13 +211,11 @@ MealSlot RecommendEngine::composeMulti(const QString &label,
 {
     MealSlot slot;
     slot.mealLabel = label;
-
     // 荤素搭配：主荤约 45%，素菜约 25%，主食约 25%，汤约 15%（可选）
     // 午餐/晚餐结构：一荤、一素、一份主食（优先白米饭），汤为可选项。
     const double meatCal = targetCal * 0.40;
     const double vegCal = targetCal * 0.22;
     const double stapleCal = targetCal * 0.28;
-    const double soupCal = targetCal * 0.10;
     const double meatProtein = targetProtein * 0.55;
     const double vegProtein = targetProtein * 0.15;
     const double stapleProtein = targetProtein * 0.20;
@@ -243,13 +241,25 @@ MealSlot RecommendEngine::composeMulti(const QString &label,
         }
     }
 
-    // 晚餐额外尝试加汤，增强「多道菜」感
-    if (QRandomGenerator::global()->bounded(100) < 45) {
-        Recipe soup = pickOne(soups, soupCal, targetProtein * 0.1, used, allergens, prefs, &score);
+    // v5 今日方案规定午餐固定以紧凑 2×2 展示四项：一荤、一素、
+    // 一份主食和一份汤。汤不属于主食，因而不会破坏“有且仅有一道主食”。
+    if (label == QStringLiteral("午餐")) {
+        Recipe soup = pickOne(soups, targetCal * 0.10, targetProtein * 0.10,
+                              used, allergens, prefs, &score);
         if (soup.isValid()) {
             used.insert(soup.id);
             slot.dishes.append(soup);
         }
+        auto rank = [](const Recipe &recipe) {
+            const QString role = recipe.dishRole.toLower();
+            if (role == QLatin1String("meat")) return 0;
+            if (role == QLatin1String("staple")) return 1;
+            if (role == QLatin1String("soup")) return 2;
+            if (role == QLatin1String("vegetable")) return 3;
+            return 4;
+        };
+        std::stable_sort(slot.dishes.begin(), slot.dishes.end(),
+                         [&](const Recipe &a, const Recipe &b) { return rank(a) < rank(b); });
     }
 
     // 兜底：若荤素都空，从 meats+vegs+staples 混选 2 道
@@ -393,6 +403,13 @@ RecommendResult RecommendEngine::generateLegacyPlan(const User &user,
     QList<Recipe> meats = dao.findByRole(QStringLiteral("meat"));
     QList<Recipe> vegs = dao.findByRole(QStringLiteral("vegetable"));
     QList<Recipe> staples = dao.findByRole(QStringLiteral("staple"));
+    // 排除小吃误入主食池（如可乐土豆饼）
+    staples.erase(std::remove_if(staples.begin(), staples.end(),
+                                  [](const Recipe &r) {
+                                      return r.dishRole == QLatin1String("snack")
+                                             || r.name.contains(QStringLiteral("可乐饼"));
+                                  }),
+                  staples.end());
     QList<Recipe> soups = dao.findByRole(QStringLiteral("soup"));
     QList<Recipe> mixed = dao.findByRole(QStringLiteral("mixed"));
 
@@ -449,7 +466,9 @@ RecommendResult RecommendEngine::generateLegacyPlan(const User &user,
                                   lunchCal, lunchProtein, used, allergens, prefs, true);
         plan.dinner = composeMulti(QStringLiteral("晚餐"), meats, vegs, staples, soups,
                                    dinnerCal, dinnerProtein, used, allergens, prefs, true);
-        plan.valid = plan.breakfast.isValid() && plan.lunch.isValid() && plan.dinner.isValid();
+        plan.valid = plan.breakfast.isValid()
+                     && plan.lunch.hasBalancedMainMeal()
+                     && plan.dinner.hasBalancedMainMeal();
         return plan;
     };
 
@@ -500,10 +519,19 @@ RecommendResult RecommendEngine::generateLegacyPlan(const User &user,
                                 + result.lunch.totalProtein()
                                 + result.dinner.totalProtein();
 
+    // 旧规则同样必须遵守日总量上限，避免 NP 候选不足时降级后重新输出
+    // 严重超标的方案。无法满足时明确失败，不向用户展示错误营养计划。
+    if (totalCal > dailyCal * 1.10) {
+        result.valid = false;
+        result.summary = QStringLiteral("现有菜谱无法组合出符合 %1 kcal 目标的完整三餐，请补充低热量菜谱后重试。")
+                             .arg(dailyCal);
+        return result;
+    }
+
     result.summary = QStringLiteral(
         "日目标 %1 kcal / 蛋白约 %2 g。"
         "早餐「%3」；午餐「%4」；晚餐「%5」。"
-        "午/晚餐按荤素+主食（或汤）搭配；合计约 %6 kcal、蛋白 %7 g。")
+        "午餐和晚餐均按荤素+一份主食搭配；合计约 %6 kcal、蛋白 %7 g。")
         .arg(dailyCal)
         .arg(dailyProtein, 0, 'f', 0)
         .arg(result.breakfast.title())

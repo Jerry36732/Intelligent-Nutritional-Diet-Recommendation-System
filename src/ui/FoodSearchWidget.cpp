@@ -1,4 +1,7 @@
 #include "FoodSearchWidget.h"
+#include "FoodDetailDialog.h"
+#include "IngredientVisionDialog.h"
+#include "UiAssets.h"
 
 #include "../dao/DatabaseManager.h"
 #include "../dao/FoodDAO.h"
@@ -11,33 +14,29 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPushButton>
+#include <QToolButton>
 #include <QSignalBlocker>
+#include <QSizePolicy>
 #include <QTableWidget>
+#include <QTimer>
 #include <QVBoxLayout>
 
 namespace {
 struct CategoryDefinition {
     const char *name;
-    const char *detail;
+    const char *icon;
+    const char *color;
 };
 
 const CategoryDefinition kCategories[] = {
-    {"全部分类", "浏览全部食材"},
-    {"谷类及制品", "小麦 · 稻米 · 玉米 · 杂粮"},
-    {"薯类、淀粉及制品", "薯类 · 淀粉类"},
-    {"干豆类及制品", "大豆 · 绿豆 · 赤豆 · 豆制品"},
-    {"蔬菜类及制品", "根菜 · 鲜豆 · 瓜果 · 叶菜"},
-    {"菌藻类", "菌类 · 藻类"},
-    {"水果类及制品", "仁果 · 核果 · 浆果 · 瓜果"},
-    {"坚果、种子类", "树坚果 · 种子"},
-    {"畜肉类及制品", "猪 · 牛 · 羊 · 其它"},
-    {"禽肉类及制品", "鸡 · 鸭 · 鹅 · 火鸡"},
-    {"乳类及制品", "液态乳 · 酸奶 · 奶酪"},
-    {"蛋类及制品", "鸡蛋 · 鸭蛋 · 鹌鹑蛋"},
-    {"鱼虾蟹贝类", "鱼 · 虾 · 蟹 · 贝"},
-    {"饮料类", "果汁 · 茶饮 · 含乳饮料"},
-    {"油脂及调味品", "植物油 · 动物油 · 酱醋"},
+    {"全部", "category-grid", "#059669"}, {"谷物", "grain", "#059669"},
+    {"菌藻类", "mushroom", "#E64C4C"}, {"豆制品", "beans", "#F28A19"},
+    {"蔬菜", "leaf", "#28A745"}, {"水果", "apple", "#E84C55"},
+    {"肉禽蛋", "meat", "#D94B4B"}, {"鱼虾海鲜", "fish", "#2D7DD2"},
+    {"乳制品", "milk", "#2F80D0"}, {"坚果油脂", "nut", "#E07A21"},
+    {"调味料", "condiment", "#E5484D"}, {"其他", "other", "#526079"},
 };
 
 bool containsAny(const QString &text, const QStringList &words)
@@ -144,30 +143,62 @@ const QStringList &kwDrink()
 QString mapUsdaLabel(const QString &label)
 {
     const QString l = label.toLower();
-    if (l.contains(QLatin1String("vegetab"))) return QStringLiteral("蔬菜类及制品");
-    if (l.contains(QLatin1String("fruit"))) return QStringLiteral("水果类及制品");
+    if (l.contains(QLatin1String("vegetab"))) return QStringLiteral("蔬菜");
+    if (l.contains(QLatin1String("fruit"))) return QStringLiteral("水果");
     if (l.contains(QLatin1String("pork")) || l.contains(QLatin1String("beef"))
         || l.contains(QLatin1String("lamb")) || l.contains(QLatin1String("meat")))
-        return QStringLiteral("畜肉类及制品");
+        return QStringLiteral("肉禽蛋");
     if (l.contains(QLatin1String("poultry")) || l.contains(QLatin1String("chicken"))
         || l.contains(QLatin1String("turkey")))
-        return QStringLiteral("禽肉类及制品");
-    if (l.contains(QLatin1String("dairy"))) return QStringLiteral("乳类及制品");
-    if (l.contains(QLatin1String("egg"))) return QStringLiteral("蛋类及制品");
+        return QStringLiteral("肉禽蛋");
+    if (l.contains(QLatin1String("egg"))) return QStringLiteral("肉禽蛋");
+    if (l.contains(QLatin1String("dairy"))) return QStringLiteral("乳制品");
     if (l.contains(QLatin1String("finfish")) || l.contains(QLatin1String("shellfish"))
         || l.contains(QLatin1String("fish")))
-        return QStringLiteral("鱼虾蟹贝类");
+        return QStringLiteral("鱼虾海鲜");
     if (l.contains(QLatin1String("cereal")) || l.contains(QLatin1String("pasta"))
         || l.contains(QLatin1String("baked")) || l.contains(QLatin1String("grain")))
-        return QStringLiteral("谷类及制品");
-    if (l.contains(QLatin1String("legume"))) return QStringLiteral("干豆类及制品");
+        return QStringLiteral("谷物");
+    if (l.contains(QLatin1String("legume"))) return QStringLiteral("豆制品");
     if (l.contains(QLatin1String("nut")) || l.contains(QLatin1String("seed")))
-        return QStringLiteral("坚果、种子类");
+        return QStringLiteral("坚果油脂");
     if (l.contains(QLatin1String("fat")) || l.contains(QLatin1String("oil"))
         || l.contains(QLatin1String("spice")))
-        return QStringLiteral("油脂及调味品");
-    if (l.contains(QLatin1String("beverage"))) return QStringLiteral("饮料类");
+        return QStringLiteral("坚果油脂");
+    if (l.contains(QLatin1String("beverage"))) return QStringLiteral("其他");
     return {};
+}
+
+QFrame *makeFoodSummary(QWidget *parent, const QString &title, const QString &iconName,
+                        const QString &tone, QLabel **value)
+{
+    auto *card = new QFrame(parent);
+    card->setObjectName(QStringLiteral("FoodSummaryCard"));
+    card->setProperty("tone", tone);
+    auto *layout = new QHBoxLayout(card);
+    layout->setContentsMargins(18, 12, 18, 12);
+    layout->setSpacing(14);
+    auto *icon = new QLabel(card);
+    icon->setObjectName(QStringLiteral("FoodSummaryIcon"));
+    icon->setProperty("tone", tone);
+    icon->setAlignment(Qt::AlignCenter);
+    icon->setFixedSize(46, 46);
+    const QColor color(tone == QStringLiteral("green") ? QStringLiteral("#08A96E")
+                       : tone == QStringLiteral("orange") ? QStringLiteral("#E99A2E")
+                                                            : QStringLiteral("#725DD4"));
+    icon->setPixmap(UiAssets::svgPixmap(iconName, QSize(24, 24), color, icon));
+    auto *copy = new QVBoxLayout;
+    copy->setSpacing(1);
+    auto *caption = new QLabel(title, card);
+    caption->setObjectName(QStringLiteral("FoodSummaryCaption"));
+    *value = new QLabel(QStringLiteral("0"), card);
+    (*value)->setObjectName(QStringLiteral("FoodSummaryValue"));
+    (*value)->setProperty("tone", tone);
+    copy->addWidget(caption);
+    copy->addWidget(*value);
+    layout->addWidget(icon);
+    layout->addLayout(copy, 1);
+    return card;
 }
 } // namespace
 
@@ -175,68 +206,83 @@ FoodSearchWidget::FoodSearchWidget(QWidget *parent)
     : QWidget(parent)
 {
     auto *root = new QVBoxLayout(this);
-    root->setContentsMargins(34, 28, 34, 26);
-    root->setSpacing(14);
+    root->setContentsMargins(23, 12, 30, 18);
+    root->setSpacing(15);
 
     auto *titleRow = new QHBoxLayout;
     auto *titleBox = new QVBoxLayout;
     titleBox->setSpacing(5);
-    auto *eyebrow = new QLabel(QStringLiteral("NUTRITION FOOD GROUPS"), this);
-    eyebrow->setObjectName(QStringLiteral("FoodEyebrow"));
-    auto *title = new QLabel(QStringLiteral("食材分好类，选择更有根据。"), this);
+    auto *title = new QLabel(QStringLiteral("食材营养库"), this);
     title->setObjectName(QStringLiteral("FoodPageTitle"));
-    auto *hint = new QLabel(QStringLiteral("参照食物分类方式整理。点击分类卡片即可筛选下方营养数据。"), this);
+    auto *hint = new QLabel(QStringLiteral("按名称或分类查询食材的每 100g 营养数据"), this);
     hint->setProperty("class", QVariant(QStringLiteral("HintText")));
-    titleBox->addWidget(eyebrow);
     titleBox->addWidget(title);
     titleBox->addWidget(hint);
 
     m_countLabel = new QLabel(this);
-    m_countLabel->setObjectName(QStringLiteral("FoodCountLabel"));
+    m_countLabel->setObjectName(QStringLiteral("FoodSummaryValue"));
     m_countLabel->setAlignment(Qt::AlignCenter);
     m_countLabel->setMinimumWidth(110);
+    m_countLabel->hide();
     titleRow->addLayout(titleBox);
     titleRow->addStretch();
     titleRow->addWidget(m_countLabel, 0, Qt::AlignBottom);
 
     m_searchEdit = new QLineEdit(this);
     m_searchEdit->setObjectName(QStringLiteral("FoodSearchInput"));
-    m_searchEdit->setPlaceholderText(QStringLiteral("搜索食材、食物分类或子分类，例如：鸡、谷物、叶菜…"));
+    m_searchEdit->setPlaceholderText(QStringLiteral("搜索食材名称"));
     m_searchEdit->setClearButtonEnabled(true);
+    m_searchEdit->setFixedWidth(274);
+    m_searchEdit->setFixedHeight(38);
+    m_searchEdit->addAction(UiAssets::svgIcon(QStringLiteral("search")),
+                            QLineEdit::LeadingPosition);
+    m_selectedCategory = QStringLiteral("全部");
 
-    auto *classificationLabel = new QLabel(QStringLiteral("食物分类  /  FOOD GROUPS"), this);
+    auto *classificationLabel = new QLabel(QStringLiteral("分类筛选"), this);
     classificationLabel->setObjectName(QStringLiteral("FoodCategorySectionTitle"));
 
     auto *categoryPanel = new QFrame(this);
     categoryPanel->setObjectName(QStringLiteral("FoodCategoryPanel"));
-    auto *categoryGrid = new QGridLayout(categoryPanel);
-    categoryGrid->setContentsMargins(13, 13, 13, 13);
-    categoryGrid->setHorizontalSpacing(10);
-    categoryGrid->setVerticalSpacing(10);
+    auto *categoryBox = new QVBoxLayout(categoryPanel);
+    categoryBox->setContentsMargins(14, 14, 14, 14);
+    categoryBox->setSpacing(8);
+    auto *firstCategoryRow = new QHBoxLayout;
+    auto *secondCategoryRow = new QHBoxLayout;
+    firstCategoryRow->setSpacing(10);
+    secondCategoryRow->setSpacing(10);
 
     for (int i = 0; i < static_cast<int>(sizeof(kCategories) / sizeof(kCategories[0])); ++i) {
         const auto &definition = kCategories[i];
-        auto *button = new QPushButton(
-            QStringLiteral("%1\n%2")
-                .arg(QString::fromUtf8(definition.name), QString::fromUtf8(definition.detail)),
-            categoryPanel);
+        auto *button = new QPushButton(QString::fromUtf8(definition.name), categoryPanel);
         button->setCheckable(true);
         button->setCursor(Qt::PointingHandCursor);
         button->setProperty("class", QVariant(QStringLiteral("CategoryFilter")));
         button->setProperty("category", QString::fromUtf8(definition.name));
-        button->setMinimumHeight(54);
-        button->setToolTip(QString::fromUtf8(definition.detail));
+        button->setFixedHeight(34);
+        button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        const int categoryWidth = qBound(
+            61, button->fontMetrics().horizontalAdvance(button->text()) + 40, 104);
+        button->setFixedWidth(categoryWidth);
+        UiAssets::setButtonIcon(button, QString::fromUtf8(definition.icon), 18,
+                                QColor(QString::fromLatin1(definition.color)));
         m_categoryButtons.append(button);
-        categoryGrid->addWidget(button, i / 3, i % 3);
+        if (i < 8)
+            firstCategoryRow->addWidget(button);
+        else
+            secondCategoryRow->addWidget(button);
         connect(button, &QPushButton::clicked, this, &FoodSearchWidget::onCategoryClicked);
     }
+    firstCategoryRow->addStretch();
+    secondCategoryRow->addStretch();
+    categoryBox->addLayout(firstCategoryRow);
+    categoryBox->addLayout(secondCategoryRow);
     if (!m_categoryButtons.isEmpty())
         m_categoryButtons.first()->setChecked(true);
 
     auto *tableTitleRow = new QHBoxLayout;
     auto *tableTitle = new QLabel(QStringLiteral("食材营养数据"), this);
     tableTitle->setProperty("class", QVariant(QStringLiteral("SectionTitle")));
-    auto *tableHint = new QLabel(QStringLiteral("每 100g 可食部分 · 单次最多显示 200 条"), this);
+    auto *tableHint = new QLabel(QStringLiteral("以下均为每 100g 可食部分营养值"), this);
     tableHint->setProperty("class", QVariant(QStringLiteral("HintText")));
     tableTitleRow->addWidget(tableTitle);
     tableTitleRow->addStretch();
@@ -244,34 +290,148 @@ FoodSearchWidget::FoodSearchWidget(QWidget *parent)
 
     m_table = new QTableWidget(this);
     m_table->setColumnCount(7);
-    m_table->setHorizontalHeaderLabels({QStringLiteral("食材名称"), QStringLiteral("食物大类"),
-                                        QStringLiteral("子分类"), QStringLiteral("热量(kcal)"),
+    m_table->setHorizontalHeaderLabels({QStringLiteral("食材名称"), QStringLiteral("分类"),
+                                        QStringLiteral("热量(kcal)"),
                                         QStringLiteral("蛋白质(g)"), QStringLiteral("脂肪(g)"),
-                                        QStringLiteral("碳水(g)")});
+                                        QStringLiteral("碳水(g)"), QStringLiteral("收藏")});
     // ResizeToContents 会在每次筛选时扫描所有单元格，食材数据多时容易让界面失去响应。
     m_table->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     for (int column = 1; column < 7; ++column)
         m_table->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Interactive);
-    m_table->setColumnWidth(1, 128);
-    m_table->setColumnWidth(2, 132);
-    for (int column = 3; column < 7; ++column)
-        m_table->setColumnWidth(column, 88);
+    m_table->setColumnWidth(1, 105);
+    for (int column = 2; column < 6; ++column)
+        m_table->setColumnWidth(column, 92);
+    m_table->setColumnWidth(6, 60);
     m_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_table->setSelectionMode(QAbstractItemView::SingleSelection);
     m_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_table->setAlternatingRowColors(true);
     m_table->verticalHeader()->setVisible(false);
+    m_table->verticalHeader()->setDefaultSectionSize(48);
+    m_table->horizontalHeader()->setFixedHeight(52);
     m_table->setShowGrid(false);
     m_table->setWordWrap(false);
+    m_table->setToolTip(QStringLiteral("点击最右侧星标收藏食材"));
 
+    m_searchTimer = new QTimer(this);
+    m_searchTimer->setSingleShot(true);
+    m_searchTimer->setInterval(160);
+    connect(m_searchTimer, &QTimer::timeout, this, [this]() { refreshResults(); });
     connect(m_searchEdit, &QLineEdit::textChanged, this, &FoodSearchWidget::onSearchTextChanged);
+    connect(m_table, &QTableWidget::cellClicked, this, [this](int row, int column) {
+        if (column == 6 || row < 0)
+            return;
+        const QTableWidgetItem *item = m_table->item(row, 0);
+        const FoodRow *foodRow = item ? foodRowById(item->data(Qt::UserRole).toInt()) : nullptr;
+        if (foodRow)
+            openFoodDetail(*foodRow);
+    });
 
-    root->addLayout(titleRow);
-    root->addWidget(m_searchEdit);
-    root->addWidget(classificationLabel);
+    title->hide();
+    hint->hide();
+    classificationLabel->hide();
+    tableTitle->hide();
+    tableHint->hide();
+
+    auto *summaryRow = new QWidget(this);
+    summaryRow->setObjectName(QStringLiteral("FoodSummaryRow"));
+    summaryRow->setFixedHeight(87);
+    auto *summaryLay = new QHBoxLayout(summaryRow);
+    summaryLay->setContentsMargins(0, 0, 0, 0);
+    summaryLay->setSpacing(14);
+    QWidget *recordedSummary = makeFoodSummary(summaryRow, QStringLiteral("已收录"),
+                                               QStringLiteral("database"), QStringLiteral("green"),
+                                               &m_countLabel);
+    recordedSummary->setFixedWidth(275);
+    summaryLay->addWidget(recordedSummary);
+    summaryLay->addWidget(makeFoodSummary(summaryRow, QStringLiteral("常用分类"),
+                                          QStringLiteral("category-grid"), QStringLiteral("orange"),
+                                          &m_categoryCount), 1);
+    summaryLay->addWidget(makeFoodSummary(summaryRow, QStringLiteral("我的收藏"),
+                                          QStringLiteral("star-outline"), QStringLiteral("purple"),
+                                          &m_favoriteCount), 1);
+    categoryPanel->setFixedHeight(115);
+    root->addWidget(summaryRow);
     root->addWidget(categoryPanel);
-    root->addLayout(tableTitleRow);
+    auto *searchActions = new QHBoxLayout;
+    searchActions->setSpacing(12);
+    auto *visionButton = new QPushButton(QStringLiteral("拍照识别食材"), this);
+    visionButton->setObjectName(QStringLiteral("FoodVisionEntryButton"));
+    visionButton->setFixedSize(154, 40);
+    visionButton->setToolTip(QStringLiteral("识别食材名称、特点、常见用途和可用菜谱"));
+    UiAssets::setButtonIcon(visionButton, QStringLiteral("camera"), 18,
+                            QColor(QStringLiteral("#08A96E")));
+    searchActions->addWidget(m_searchEdit);
+    searchActions->addStretch();
+    searchActions->addWidget(visionButton);
+    root->addLayout(searchActions);
     root->addWidget(m_table, 1);
+
+    connect(visionButton, &QPushButton::clicked, this,
+            &FoodSearchWidget::openIngredientVision);
+}
+
+void FoodSearchWidget::setUserId(int userId)
+{
+    if (m_userId == userId)
+        return;
+    m_userId = userId;
+    if (m_loaded)
+        refreshResults();
+}
+
+const FoodRow *FoodSearchWidget::foodRowById(int foodId) const
+{
+    for (const FoodRow &row : m_rows) {
+        if (row.food.id == foodId)
+            return &row;
+    }
+    return nullptr;
+}
+
+void FoodSearchWidget::openFoodDetail(const FoodRow &row, int reviewFavoriteState)
+{
+    QWidget *owner = window();
+    FoodDetailDialog dialog(row.food, row.category, m_userId, owner, reviewFavoriteState);
+    connect(&dialog, &FoodDetailDialog::favoriteChanged, this, [this](int, bool) {
+        refreshResults();
+        emit foodFavoriteChanged();
+    });
+    dialog.exec();
+}
+
+void FoodSearchWidget::openReviewDetail(bool favoriteState)
+{
+    if (!m_loaded)
+        reload();
+    const FoodRow *reviewRow = nullptr;
+    for (const FoodRow &row : m_rows) {
+        if (row.food.name == QStringLiteral("燕麦片")) {
+            reviewRow = &row;
+            break;
+        }
+    }
+    if (!reviewRow && !m_rows.isEmpty())
+        reviewRow = &m_rows.first();
+    if (reviewRow)
+        openFoodDetail(*reviewRow, favoriteState ? 1 : 0);
+}
+
+void FoodSearchWidget::setUsdaReviewState()
+{
+    if (!m_loaded)
+        reload();
+    m_selectedCategory = QStringLiteral("全部");
+    if (m_searchEdit)
+        m_searchEdit->clear();
+    updateCategoryButtons();
+    refreshResults();
+}
+
+void FoodSearchWidget::openIngredientVision()
+{
+    IngredientVisionDialog dialog(m_userId, window());
+    dialog.exec();
 }
 
 void FoodSearchWidget::reload()
@@ -309,7 +469,8 @@ void FoodSearchWidget::reload()
 
 void FoodSearchWidget::onSearchTextChanged(const QString &)
 {
-    refreshResults();
+    if (m_searchTimer)
+        m_searchTimer->start();
 }
 
 void FoodSearchWidget::onCategoryClicked()
@@ -337,10 +498,8 @@ void FoodSearchWidget::refreshResults()
     QList<const FoodRow *> filtered;
     filtered.reserve(m_rows.size());
     for (const FoodRow &row : m_rows) {
-        const bool matchesCategory =
-            m_selectedCategory.contains(QStringLiteral("全部"))
-            || m_selectedCategory == QLatin1String("全部分类")
-            || row.category == m_selectedCategory;
+        const bool matchesCategory = m_selectedCategory == QStringLiteral("全部")
+                                     || row.category == m_selectedCategory;
         if (!matchesCategory)
             continue;
         if (!keyword.isEmpty()) {
@@ -355,20 +514,43 @@ void FoodSearchWidget::refreshResults()
 
     constexpr int kPreviewLimit = 120;
     populateTable(filtered.mid(0, kPreviewLimit));
-    m_countLabel->setText(QStringLiteral("%1\n%2 条食材")
-                              .arg(m_selectedCategory)
-                              .arg(filtered.size()));
+    m_countLabel->setText(QStringLiteral("%1 种").arg(m_rows.size()));
+    if (m_categoryCount)
+        m_categoryCount->setText(QStringLiteral("12"));
+    if (m_favoriteCount)
+        m_favoriteCount->setText(QString::number(m_userId > 0
+                                                     ? FoodDAO().findFavorites(m_userId).size()
+                                                     : 0));
     m_refreshing = false;
 }
 
 QString FoodSearchWidget::categoryForFood(const Food &food) const
 {
     if (!food.category.isEmpty()) {
-        // 已是中文大类
-        for (const auto &def : kCategories) {
-            if (food.category == QLatin1String(def.name))
-                return food.category;
-        }
+        const QString c = food.category;
+        if (c.contains(QStringLiteral("菌")) || c.contains(QStringLiteral("藻")))
+            return QStringLiteral("菌藻类");
+        if (c.contains(QStringLiteral("豆")))
+            return QStringLiteral("豆制品");
+        if (c.contains(QStringLiteral("蔬菜")))
+            return QStringLiteral("蔬菜");
+        if (c.contains(QStringLiteral("水果")))
+            return QStringLiteral("水果");
+        if (c.contains(QStringLiteral("畜肉")) || c.contains(QStringLiteral("禽肉"))
+            || c.contains(QStringLiteral("蛋类")))
+            return QStringLiteral("肉禽蛋");
+        if (c.contains(QStringLiteral("鱼")) || c.contains(QStringLiteral("虾"))
+            || c.contains(QStringLiteral("蟹")) || c.contains(QStringLiteral("贝")))
+            return QStringLiteral("鱼虾海鲜");
+        if (c.contains(QStringLiteral("乳")))
+            return QStringLiteral("乳制品");
+        if (c.contains(QStringLiteral("谷")) || c.contains(QStringLiteral("薯"))
+            || c.contains(QStringLiteral("淀粉")))
+            return QStringLiteral("谷物");
+        if (c.contains(QStringLiteral("坚果")) || c.contains(QStringLiteral("种子")))
+            return QStringLiteral("坚果油脂");
+        if (c.contains(QStringLiteral("调味")))
+            return QStringLiteral("调味料");
         const QString mapped = mapUsdaLabel(food.category);
         if (!mapped.isEmpty())
             return mapped;
@@ -376,50 +558,38 @@ QString FoodSearchWidget::categoryForFood(const Food &food) const
 
     const QString &name = food.name;
     if (containsAny(name, kwFungi())) return QStringLiteral("菌藻类");
-    if (containsAny(name, kwBean())) return QStringLiteral("干豆类及制品");
-    if (containsAny(name, kwMilk())) return QStringLiteral("乳类及制品");
-    if (containsAny(name, kwPoultry())) return QStringLiteral("禽肉类及制品");
-    if (containsAny(name, kwMeat())) return QStringLiteral("畜肉类及制品");
-    if (containsAny(name, kwEgg())) return QStringLiteral("蛋类及制品");
-    if (containsAny(name, kwSeafood())) return QStringLiteral("鱼虾蟹贝类");
-    if (containsAny(name, kwGrain())) return QStringLiteral("谷类及制品");
-    if (containsAny(name, kwStarch())) return QStringLiteral("薯类、淀粉及制品");
-    if (containsAny(name, kwFruit())) return QStringLiteral("水果类及制品");
-    if (containsAny(name, kwNut())) return QStringLiteral("坚果、种子类");
-    if (containsAny(name, kwSeasoning())) return QStringLiteral("油脂及调味品");
-    if (containsAny(name, kwDrink())) return QStringLiteral("饮料类");
-    return QStringLiteral("蔬菜类及制品");
+    if (containsAny(name, kwBean())) return QStringLiteral("豆制品");
+    if (containsAny(name, kwMilk())) return QStringLiteral("乳制品");
+    if (containsAny(name, kwPoultry()) || containsAny(name, kwMeat())
+        || containsAny(name, kwEgg())) return QStringLiteral("肉禽蛋");
+    if (containsAny(name, kwSeafood())) return QStringLiteral("鱼虾海鲜");
+    if (containsAny(name, kwGrain()) || containsAny(name, kwStarch()))
+        return QStringLiteral("谷物");
+    if (containsAny(name, kwFruit())) return QStringLiteral("水果");
+    if (containsAny(name, kwSeasoning())) return QStringLiteral("调味料");
+    if (containsAny(name, kwNut())) return QStringLiteral("坚果油脂");
+    if (containsAny(name, kwDrink())) return QStringLiteral("其他");
+    return QStringLiteral("其他");
 }
 
 QString FoodSearchWidget::subcategoryForCategory(const QString &category) const
 {
-    if (category == QLatin1String("蔬菜类及制品")) return QStringLiteral("叶菜、根茎或瓜果类");
-    if (category == QLatin1String("谷类及制品")) return QStringLiteral("米面或杂粮");
-    if (category == QLatin1String("鱼虾蟹贝类")) return QStringLiteral("鱼、虾、蟹或贝类");
-    if (category == QLatin1String("油脂及调味品")) return QStringLiteral("油脂或调味品");
+    if (category == QStringLiteral("蔬菜类及制品")) return QStringLiteral("叶菜、根茎或瓜果类");
+    if (category == QStringLiteral("谷类及制品")) return QStringLiteral("米面或杂粮");
+    if (category == QStringLiteral("鱼虾蟹贝类")) return QStringLiteral("鱼、虾、蟹或贝类");
+    if (category == QStringLiteral("油脂及调味品")) return QStringLiteral("油脂或调味品");
     return category;
 }
 
 void FoodSearchWidget::updateCategoryButtons()
 {
-    QHash<QString, int> counts;
-    counts.reserve(16);
-    for (const FoodRow &row : m_rows) {
-        if (!row.category.isEmpty())
-            counts[row.category] += 1;
-    }
-    const int total = m_rows.size();
-
     for (int i = 0; i < m_categoryButtons.size(); ++i) {
         QPushButton *button = m_categoryButtons.at(i);
         const QString category = button->property("category").toString();
-        // 第一项或名称匹配均视为「全部」
-        const bool isAll = (i == 0) || category.contains(QStringLiteral("全部"));
-        const int count = isAll ? total : counts.value(category, 0);
-        const QString detail = button->toolTip();
+        const bool isAll = (i == 0) || category == QStringLiteral("全部");
         const QSignalBlocker blocker(button);
-        button->setText(QStringLiteral("%1  ·  %2\n%3").arg(category).arg(count).arg(detail));
-        button->setChecked(isAll ? (m_selectedCategory.contains(QStringLiteral("全部"))
+        button->setText(category);
+        button->setChecked(isAll ? (m_selectedCategory == QStringLiteral("全部")
                                     || m_selectedCategory == category)
                                  : (category == m_selectedCategory));
     }
@@ -434,13 +604,52 @@ void FoodSearchWidget::populateTable(const QList<const FoodRow *> &rows)
     m_table->setRowCount(rows.size());
     for (int i = 0; i < rows.size(); ++i) {
         const FoodRow *row = rows.at(i);
-        m_table->setItem(i, 0, new QTableWidgetItem(row->food.name));
+        auto *nameItem = new QTableWidgetItem(row->food.name);
+        nameItem->setData(Qt::UserRole, row->food.id);
+        m_table->setItem(i, 0, nameItem);
         m_table->setItem(i, 1, new QTableWidgetItem(row->category));
-        m_table->setItem(i, 2, new QTableWidgetItem(row->subcategory));
-        m_table->setItem(i, 3, new QTableWidgetItem(QString::number(row->food.calories, 'f', 1)));
-        m_table->setItem(i, 4, new QTableWidgetItem(QString::number(row->food.protein, 'f', 1)));
-        m_table->setItem(i, 5, new QTableWidgetItem(QString::number(row->food.fat, 'f', 1)));
-        m_table->setItem(i, 6, new QTableWidgetItem(QString::number(row->food.carbs, 'f', 1)));
+        m_table->setItem(i, 2, new QTableWidgetItem(QString::number(row->food.calories, 'f', 1)));
+        m_table->setItem(i, 3, new QTableWidgetItem(QString::number(row->food.protein, 'f', 1)));
+        m_table->setItem(i, 4, new QTableWidgetItem(QString::number(row->food.fat, 'f', 1)));
+        m_table->setItem(i, 5, new QTableWidgetItem(QString::number(row->food.carbs, 'f', 1)));
+        auto *favorite = new QToolButton(m_table);
+        favorite->setObjectName(QStringLiteral("FoodFavoriteStar"));
+        favorite->setCursor(Qt::PointingHandCursor);
+        favorite->setAutoRaise(true);
+        favorite->setToolTip(QStringLiteral("收藏/取消收藏 %1").arg(row->food.name));
+        const bool checked = m_userId > 0 && FoodDAO().isFavorite(m_userId, row->food.id);
+        favorite->setChecked(checked);
+        favorite->setCheckable(true);
+        auto updateStar = [favorite](bool selected) {
+            UiAssets::setButtonIcon(favorite,
+                                    selected ? QStringLiteral("star-filled")
+                                             : QStringLiteral("star-outline"),
+                                    22, selected ? QColor(QStringLiteral("#F2A23A"))
+                                                : QColor(QStringLiteral("#7A859A")));
+        };
+        updateStar(checked);
+        const int foodId = row->food.id;
+        connect(favorite, &QToolButton::clicked, this,
+                [this, favorite, foodId, updateStar](bool desired) {
+            if (m_userId <= 0) {
+                favorite->setChecked(false);
+                updateStar(false);
+                return;
+            }
+            FoodDAO dao;
+            if (!dao.setFavorite(m_userId, foodId, desired)) {
+                favorite->setChecked(!desired);
+                updateStar(!desired);
+                QMessageBox::warning(this, QStringLiteral("收藏失败"),
+                                     QStringLiteral("收藏状态未保存，请稍后重试。"));
+                return;
+            }
+            updateStar(desired);
+            if (m_favoriteCount)
+                m_favoriteCount->setText(QString::number(FoodDAO().findFavorites(m_userId).size()));
+            emit foodFavoriteChanged();
+        });
+        m_table->setCellWidget(i, 6, favorite);
     }
     m_table->setUpdatesEnabled(true);
     m_table->viewport()->update();

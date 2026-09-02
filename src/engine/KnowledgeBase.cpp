@@ -249,12 +249,12 @@ QStringList KnowledgeBase::buildRecommendationReasons(const User &user,
         }
         // 菜名启发式
         if (reasons.isEmpty() || !reasons.last().contains(def)) {
-            if (nutrient == QLatin1String("铁") && allText.contains(QStringLiteral("菠菜")))
+            if (nutrient == QStringLiteral("铁") && allText.contains(QStringLiteral("菠菜")))
                 reasons.append(QStringLiteral("本方案推荐菠菜，因为它富含铁元素，有助于改善您的缺铁状况。"));
-            else if (nutrient == QLatin1String("钙")
+            else if (nutrient == QStringLiteral("钙")
                      && (allText.contains(QStringLiteral("奶")) || allText.contains(QStringLiteral("豆腐"))))
                 reasons.append(QStringLiteral("本方案含乳制品/豆制品，有助于补充钙，改善「%1」。").arg(def));
-            else if (nutrient == QLatin1String("蛋白质")
+            else if (nutrient == QStringLiteral("蛋白质")
                      && (allText.contains(QStringLiteral("鸡")) || allText.contains(QStringLiteral("蛋"))
                          || allText.contains(QStringLiteral("鱼")) || allText.contains(QStringLiteral("肉"))))
                 reasons.append(QStringLiteral("本方案含优质蛋白食材，有助于改善「%1」。").arg(def));

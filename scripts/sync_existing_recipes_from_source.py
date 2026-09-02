@@ -2,6 +2,7 @@
 """保留现有菜谱，按MDB原料字段补齐用料；未知食材显式待核验，绝不近似替代。"""
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import sqlite3
@@ -54,9 +55,15 @@ def ignored_micro_food(conn: sqlite3.Connection, source: str) -> dict:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--db", type=Path, default=DB)
+    parser.add_argument("--recipe-id", type=int, action="append",
+                        help="仅重建指定的本地 recipe id；可重复传入")
+    args = parser.parse_args()
+    requested_ids = set(args.recipe_id or [])
     payload = json.loads(RAW.read_text(encoding="utf-8-sig"))
     raw_by_id = {int(x.get("菜谱ID") or 0): x for x in payload["recipes"]}
-    conn = sqlite3.connect(DB)
+    conn = sqlite3.connect(args.db)
     conn.row_factory = sqlite3.Row
     ensure_reference_foods(conn)
     matcher = FoodMatcher(conn)
@@ -64,6 +71,8 @@ def main() -> None:
     unresolved_names = set()
 
     for recipe in conn.execute("SELECT id,name,dish_role,source_ref FROM recipes ORDER BY id").fetchall():
+        if requested_ids and int(recipe["id"]) not in requested_ids:
+            continue
         ref = recipe["source_ref"] or ""
         if not ref.startswith("MDB:"):
             continue
@@ -84,7 +93,9 @@ def main() -> None:
                     unresolved_names.add(canonical)
             mapped.append({"food": food, "source": item["source"],
                            "display": canonical_source(item["source"]) or display_name(food["name"], item["source"]),
-                           "quantity": float(item["quantity"])})
+                           "quantity": float(item["quantity"]),
+                           "raw_text": item.get("raw_text", item["source"]),
+                           "estimated_from_count": item.get("estimated_from_count", False)})
         mapped = merge_same_food(mapped)
         mark_micro_ingredients(mapped)
         if not mapped:
@@ -94,10 +105,15 @@ def main() -> None:
             item["quantity"] = round(item["quantity"], 1)
         conn.execute("DELETE FROM recipe_foods WHERE recipe_id=?", (recipe["id"],))
         for item in mapped:
+            source_text = item.get("raw_text", item["source"])
+            if item.get("estimated_from_count"):
+                source_text += "【按计数单位估重】"
+            if item.get("ignore_nutrition"):
+                source_text += "【营养忽略】"
             conn.execute(
                 "INSERT INTO recipe_foods(recipe_id,food_id,quantity,display_name,source_text) VALUES(?,?,?,?,?)",
                 (recipe["id"], item["food"]["id"], item["quantity"], item["display"],
-                 item["source"] + ("【营养忽略】" if item.get("ignore_nutrition") else "")),
+                 source_text),
             )
         if unresolved:
             incomplete += 1
@@ -127,7 +143,7 @@ def main() -> None:
     ).fetchall()
     print(json.dumps({"complete": complete, "incomplete_retained": incomplete,
                       "unresolved_foods": sorted(unresolved_names),
-                      "oil_soaked_fish": [tuple(x) for x in oil]}, ensure_ascii=False, indent=2))
+                      "oil_soaked_fish": [tuple(x) for x in oil]}, ensure_ascii=True, indent=2))
     conn.close()
 
 

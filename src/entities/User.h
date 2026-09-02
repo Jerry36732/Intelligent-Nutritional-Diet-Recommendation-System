@@ -13,6 +13,7 @@ struct User
     QString goal;            // "lose" / "gain" / "maintain"
     double height = 0.0;     // cm
     double weight = 0.0;     // kg
+    int age = 25;            // years
     int calorieTarget = 0;   // kcal/day
     QString passwordHash;    // "salt:sha256hex" — never log plaintext
     QString preferences;     // 口味偏好（兼容旧字段，逗号/顿号分隔）

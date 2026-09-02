@@ -179,13 +179,13 @@ QStringList RDSSEngine::keywordsForAllergen(const QString &allergen) const
 QStringList RDSSEngine::keywordsForIntolerance(const QString &item) const
 {
     const QString t = item.trimmed();
-    if (t == QLatin1String("乳糖"))
+    if (t == QStringLiteral("乳糖"))
         return {QStringLiteral("奶"), QStringLiteral("牛奶"), QStringLiteral("酸奶"), QStringLiteral("奶酪"),
                 QStringLiteral("奶油"), QStringLiteral("乳糖")};
-    if (t == QLatin1String("麸质"))
+    if (t == QStringLiteral("麸质"))
         return {QStringLiteral("小麦"), QStringLiteral("面粉"), QStringLiteral("面条"), QStringLiteral("馒头"),
                 QStringLiteral("面包"), QStringLiteral("麸质")};
-    if (t == QLatin1String("果糖"))
+    if (t == QStringLiteral("果糖"))
         return {QStringLiteral("蜂蜜"), QStringLiteral("果汁"), QStringLiteral("果糖")};
     if (t == QLatin1String("FODMAPs"))
         return {QStringLiteral("洋葱"), QStringLiteral("大蒜"), QStringLiteral("豆类"), QStringLiteral("苹果")};
@@ -285,7 +285,7 @@ double RDSSEngine::deficiencyBoost(const Recipe &recipe) const
                 boost += 12.0;
         }
         // 蛋白质不足时抬高高蛋白菜
-        if (nutrient == QLatin1String("蛋白质") && recipe.totalProtein >= 20.0)
+        if (nutrient == QStringLiteral("蛋白质") && recipe.totalProtein >= 20.0)
             boost += 8.0;
     }
     return boost;

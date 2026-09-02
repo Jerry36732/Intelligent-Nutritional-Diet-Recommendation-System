@@ -5,6 +5,8 @@
 #include <QSqlDriver>
 #include <QSqlError>
 #include <QSqlQuery>
+#include <QStringList>
+#include <QRegularExpression>
 #include <QDebug>
 
 DatabaseManager &DatabaseManager::getInstance()
@@ -90,6 +92,7 @@ bool DatabaseManager::ensureSchema()
             "  goal TEXT CHECK(goal IN ('lose','gain','maintain')) DEFAULT 'gain',"
             "  height REAL DEFAULT 175,"
             "  weight REAL DEFAULT 70,"
+            "  age INTEGER DEFAULT 25,"
             "  calorie_target INTEGER DEFAULT 2100,"
             "  password_hash TEXT"
             ")"),
@@ -119,9 +122,105 @@ bool DatabaseManager::ensureSchema()
             "CREATE TABLE IF NOT EXISTS favorites ("
             "  user_id INTEGER NOT NULL,"
             "  recipe_id INTEGER NOT NULL,"
+            "  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
             "  PRIMARY KEY (user_id, recipe_id),"
             "  FOREIGN KEY (user_id) REFERENCES users(id),"
             "  FOREIGN KEY (recipe_id) REFERENCES recipes(id)"
+            ")"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS food_favorites ("
+            "  user_id INTEGER NOT NULL,"
+            "  food_id INTEGER NOT NULL,"
+            "  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  PRIMARY KEY (user_id, food_id),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id),"
+            "  FOREIGN KEY (food_id) REFERENCES foods(id)"
+            ")"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS user_favorites ("
+            "  user_id INTEGER NOT NULL,"
+            "  item_type TEXT NOT NULL CHECK(item_type IN ('recipe','ingredient')),"
+            "  item_id INTEGER NOT NULL,"
+            "  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  PRIMARY KEY (user_id, item_type, item_id),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+            ")"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS user_recipe_library ("
+            "  user_id INTEGER NOT NULL,"
+            "  recipe_id INTEGER NOT NULL,"
+            "  source_type TEXT NOT NULL DEFAULT 'manual',"
+            "  source_url TEXT,"
+            "  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  PRIMARY KEY (user_id, recipe_id),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,"
+            "  FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE"
+            ")"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS user_food_logs ("
+            "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "  user_id INTEGER NOT NULL,"
+            "  eaten_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  meal_label TEXT NOT NULL DEFAULT '加餐',"
+            "  food_name TEXT NOT NULL,"
+            "  serving_grams REAL NOT NULL,"
+            "  calories REAL NOT NULL,"
+            "  protein REAL NOT NULL DEFAULT 0,"
+            "  carbs REAL NOT NULL DEFAULT 0,"
+            "  fat REAL NOT NULL DEFAULT 0,"
+            "  confidence REAL NOT NULL DEFAULT 0,"
+            "  provider TEXT,"
+            "  image_path TEXT,"
+            "  notes TEXT,"
+            "  created_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+            ")"),
+        QStringLiteral(
+            "CREATE INDEX IF NOT EXISTS idx_user_food_logs_day "
+            "ON user_food_logs(user_id,eaten_at)"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS user_health_daily ("
+            "  user_id INTEGER NOT NULL,"
+            "  record_date TEXT NOT NULL,"
+            "  steps INTEGER NOT NULL DEFAULT 0,"
+            "  active_calories REAL NOT NULL DEFAULT 0,"
+            "  weight_kg REAL NOT NULL DEFAULT 0,"
+            "  sleep_hours REAL NOT NULL DEFAULT 0,"
+            "  source TEXT NOT NULL,"
+            "  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  PRIMARY KEY (user_id,record_date,source),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+            ")"),
+        QStringLiteral(
+            "CREATE INDEX IF NOT EXISTS idx_user_health_daily_range "
+            "ON user_health_daily(user_id,record_date)"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS health_sync_sources ("
+            "  user_id INTEGER NOT NULL,"
+            "  platform TEXT NOT NULL,"
+            "  display_name TEXT NOT NULL,"
+            "  last_synced_at TEXT,"
+            "  from_date TEXT,"
+            "  to_date TEXT,"
+            "  record_count INTEGER NOT NULL DEFAULT 0,"
+            "  status TEXT NOT NULL DEFAULT 'ready',"
+            "  PRIMARY KEY (user_id,platform),"
+            "  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+            ")"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS recipe_flavor_fingerprints ("
+            "  recipe_id INTEGER PRIMARY KEY,"
+            "  sweet REAL NOT NULL DEFAULT 0,"
+            "  sour REAL NOT NULL DEFAULT 0,"
+            "  salty REAL NOT NULL DEFAULT 0,"
+            "  spicy REAL NOT NULL DEFAULT 0,"
+            "  umami REAL NOT NULL DEFAULT 0,"
+            "  aroma REAL NOT NULL DEFAULT 0,"
+            "  crispy REAL NOT NULL DEFAULT 0,"
+            "  soft REAL NOT NULL DEFAULT 0,"
+            "  source TEXT NOT NULL DEFAULT 'rule-v1',"
+            "  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime')),"
+            "  FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE"
             ")"),
         QStringLiteral(
             "CREATE INDEX IF NOT EXISTS idx_recipe_category ON recipes(category)")
@@ -155,6 +254,7 @@ bool DatabaseManager::ensureSchema()
         }
     };
     ensureColumn(QStringLiteral("users"), QStringLiteral("password_hash"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("users"), QStringLiteral("age"), QStringLiteral("INTEGER DEFAULT 25"));
     ensureColumn(QStringLiteral("users"), QStringLiteral("preferences"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("users"), QStringLiteral("allergens"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("users"), QStringLiteral("dietary_choices"), QStringLiteral("TEXT"));
@@ -162,6 +262,26 @@ bool DatabaseManager::ensureSchema()
     ensureColumn(QStringLiteral("users"), QStringLiteral("nutritional_deficiencies"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("users"), QStringLiteral("allergies"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("users"), QStringLiteral("medical_conditions"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("health_sync_sources"), QStringLiteral("from_date"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("health_sync_sources"), QStringLiteral("to_date"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("health_sync_sources"), QStringLiteral("last_synced_at"), QStringLiteral("TEXT"));
+    // SQLite 对已有表 ADD COLUMN 时不接受 CURRENT_TIMESTAMP 这类非常量默认值，
+    // 因此先兼容补列，再为旧记录回填；新记录由 DAO 明确写入 created_at。
+    ensureColumn(QStringLiteral("favorites"), QStringLiteral("created_at"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("food_favorites"), QStringLiteral("created_at"), QStringLiteral("TEXT"));
+    q.exec(QStringLiteral("UPDATE favorites SET created_at=datetime('now','localtime') "
+                          "WHERE created_at IS NULL OR created_at=''"));
+    q.exec(QStringLiteral("UPDATE food_favorites SET created_at=datetime('now','localtime') "
+                          "WHERE created_at IS NULL OR created_at=''"));
+    // 统一收藏数据源。旧版双表保留并迁移，避免清空已有用户收藏。
+    q.exec(QStringLiteral(
+        "INSERT OR IGNORE INTO user_favorites(user_id,item_type,item_id,created_at) "
+        "SELECT user_id,'recipe',recipe_id,COALESCE(NULLIF(created_at,''),datetime('now','localtime')) "
+        "FROM favorites"));
+    q.exec(QStringLiteral(
+        "INSERT OR IGNORE INTO user_favorites(user_id,item_type,item_id,created_at) "
+        "SELECT user_id,'ingredient',food_id,COALESCE(NULLIF(created_at,''),datetime('now','localtime')) "
+        "FROM food_favorites"));
     ensureColumn(QStringLiteral("foods"), QStringLiteral("category_label"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("recipes"), QStringLiteral("dish_role"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("recipes"), QStringLiteral("source"), QStringLiteral("TEXT"));
@@ -172,8 +292,150 @@ bool DatabaseManager::ensureSchema()
     ensureColumn(QStringLiteral("recipes"), QStringLiteral("per100_fat"), QStringLiteral("REAL"));
     ensureColumn(QStringLiteral("recipes"), QStringLiteral("per100_carbs"), QStringLiteral("REAL"));
     ensureColumn(QStringLiteral("recipes"), QStringLiteral("source_ref"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("recipes"), QStringLiteral("nutrition_verified_at"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("recipe_foods"), QStringLiteral("display_name"), QStringLiteral("TEXT"));
     ensureColumn(QStringLiteral("recipe_foods"), QStringLiteral("source_text"), QStringLiteral("TEXT"));
+    ensureColumn(QStringLiteral("recipe_foods"), QStringLiteral("quantity_text"), QStringLiteral("TEXT"));
+
+    // MDB:4826 的旧导入记录丢失了数字，错误地只保留了 100g 鸡蛋。
+    // 原始配方可制作 10 份，这里按每份折算并幂等修复原料与营养。
+    {
+        QSqlQuery recipeLookup(db);
+        recipeLookup.prepare(QStringLiteral(
+            "SELECT id FROM recipes WHERE source_ref='MDB:4826' OR name='煎香椿饼' "
+            "ORDER BY CASE WHEN source_ref='MDB:4826' THEN 0 ELSE 1 END LIMIT 1"));
+        int recipeId = 0;
+        if (recipeLookup.exec() && recipeLookup.next())
+            recipeId = recipeLookup.value(0).toInt();
+        recipeLookup.finish();
+
+        bool needsRepair = false;
+        if (recipeId > 0) {
+            QSqlQuery check(db);
+            check.prepare(QStringLiteral(
+                "SELECT COUNT(*), SUM(CASE WHEN COALESCE(NULLIF(rf.display_name,''),f.name) "
+                "LIKE '%香椿%' THEN 1 ELSE 0 END) "
+                "FROM recipe_foods rf JOIN foods f ON f.id=rf.food_id WHERE rf.recipe_id=:rid"));
+            check.bindValue(QStringLiteral(":rid"), recipeId);
+            if (check.exec() && check.next())
+                needsRepair = check.value(0).toInt() < 8 || check.value(1).toInt() == 0;
+            check.finish();
+        }
+
+        if (needsRepair) {
+            struct IngredientRepair {
+                int foodId;
+                QString displayName;
+                double grams;
+                QString quantityText;
+                QString sourceText;
+            };
+            const QList<IngredientRepair> ingredients = {
+                {1, QStringLiteral("面粉"), 50.0, QStringLiteral("50 g"),
+                 QStringLiteral("原配方：面粉500克；按10份折算")},
+                {304, QStringLiteral("香椿芽"), 25.0, QStringLiteral("25 g"),
+                 QStringLiteral("原配方：香椿芽250克；按10份折算")},
+                {835, QStringLiteral("鸡蛋"), 20.0, QStringLiteral("20 g（原配方4个/10份）"),
+                 QStringLiteral("原配方：鸡蛋4个；按10份折算")},
+                {185, QStringLiteral("葱花"), 1.0, QStringLiteral("1 g"),
+                 QStringLiteral("原配方：葱花10克；按10份折算")},
+                {2069, QStringLiteral("精盐"), 0.5, QStringLiteral("0.5 g"),
+                 QStringLiteral("原配方：精盐5克；按10份折算")},
+                {2070, QStringLiteral("味精"), 0.2, QStringLiteral("0.2 g"),
+                 QStringLiteral("原配方：味精2克；按10份折算")},
+                {1943, QStringLiteral("香油"), 0.5, QStringLiteral("0.5 g"),
+                 QStringLiteral("原配方：香油5克；按10份折算")},
+                {1913, QStringLiteral("化猪油"), 10.0, QStringLiteral("10 g"),
+                 QStringLiteral("原配方：化猪油100克；按10份折算")},
+            };
+
+            q.finish();
+            bool repaired = db.transaction();
+            if (repaired) {
+                QSqlQuery removeOld(db);
+                removeOld.prepare(QStringLiteral("DELETE FROM recipe_foods WHERE recipe_id=:rid"));
+                removeOld.bindValue(QStringLiteral(":rid"), recipeId);
+                repaired = removeOld.exec();
+            }
+            for (const IngredientRepair &ingredient : ingredients) {
+                if (!repaired)
+                    break;
+                QSqlQuery insert(db);
+                insert.prepare(QStringLiteral(
+                    "INSERT INTO recipe_foods(recipe_id,food_id,quantity,display_name,source_text,quantity_text) "
+                    "SELECT :rid,id,:grams,:display,:source,:quantityText FROM foods WHERE id=:foodId"));
+                insert.bindValue(QStringLiteral(":rid"), recipeId);
+                insert.bindValue(QStringLiteral(":foodId"), ingredient.foodId);
+                insert.bindValue(QStringLiteral(":grams"), ingredient.grams);
+                insert.bindValue(QStringLiteral(":display"), ingredient.displayName);
+                insert.bindValue(QStringLiteral(":source"), ingredient.sourceText);
+                insert.bindValue(QStringLiteral(":quantityText"), ingredient.quantityText);
+                repaired = insert.exec() && insert.numRowsAffected() == 1;
+                if (!repaired)
+                    qWarning() << "repair 煎香椿饼 ingredient:" << insert.lastError().text();
+            }
+
+            if (repaired) {
+                QSqlQuery nutrition(db);
+                nutrition.prepare(QStringLiteral(
+                    "SELECT COALESCE(SUM(rf.quantity),0),"
+                    "COALESCE(SUM(COALESCE(f.calories,0)*rf.quantity/100.0),0),"
+                    "COALESCE(SUM(COALESCE(f.protein,0)*rf.quantity/100.0),0),"
+                    "COALESCE(SUM(COALESCE(f.fat,0)*rf.quantity/100.0),0),"
+                    "COALESCE(SUM(COALESCE(f.carbs,0)*rf.quantity/100.0),0) "
+                    "FROM recipe_foods rf JOIN foods f ON f.id=rf.food_id WHERE rf.recipe_id=:rid"));
+                nutrition.bindValue(QStringLiteral(":rid"), recipeId);
+                repaired = nutrition.exec() && nutrition.next();
+                if (repaired) {
+                    const double weight = nutrition.value(0).toDouble();
+                    const double calories = nutrition.value(1).toDouble();
+                    const double protein = nutrition.value(2).toDouble();
+                    const double fat = nutrition.value(3).toDouble();
+                    const double carbs = nutrition.value(4).toDouble();
+                    QSqlQuery update(db);
+                    update.prepare(QStringLiteral(
+                        "UPDATE recipes SET total_weight=:weight,total_calories=:calories,"
+                        "total_protein=:protein,total_fat=:fat,total_carbs=:carbs,"
+                        "per100_calories=:pc,per100_protein=:pp,per100_fat=:pf,per100_carbs=:pcb,"
+                        "nutrition_verified_at=datetime('now','localtime') WHERE id=:rid"));
+                    update.bindValue(QStringLiteral(":weight"), weight);
+                    update.bindValue(QStringLiteral(":calories"), calories);
+                    update.bindValue(QStringLiteral(":protein"), protein);
+                    update.bindValue(QStringLiteral(":fat"), fat);
+                    update.bindValue(QStringLiteral(":carbs"), carbs);
+                    update.bindValue(QStringLiteral(":pc"), weight > 0 ? calories * 100.0 / weight : 0.0);
+                    update.bindValue(QStringLiteral(":pp"), weight > 0 ? protein * 100.0 / weight : 0.0);
+                    update.bindValue(QStringLiteral(":pf"), weight > 0 ? fat * 100.0 / weight : 0.0);
+                    update.bindValue(QStringLiteral(":pcb"), weight > 0 ? carbs * 100.0 / weight : 0.0);
+                    update.bindValue(QStringLiteral(":rid"), recipeId);
+                    repaired = update.exec();
+                }
+            }
+            if (repaired) {
+                if (!db.commit())
+                    qWarning() << "commit 煎香椿饼 repair:" << db.lastError().text();
+            } else {
+                db.rollback();
+                qWarning() << "煎香椿饼 ingredient repair rolled back";
+            }
+        }
+    }
+
+    // 修复旧版 MDB 导入器产生的重复步骤编号，例如“1. 1。步骤正文”。
+    // 使用幂等 replace，既兼容现有用户数据库，也不会改动已经规范的数据。
+    for (int stepNumber = 1; stepNumber <= 30; ++stepNumber) {
+        const QString duplicated = QStringLiteral("%1. %1。").arg(stepNumber);
+        const QString normalized = QStringLiteral("%1. ").arg(stepNumber);
+        QSqlQuery fixRecipeSteps(db);
+        fixRecipeSteps.prepare(QStringLiteral(
+            "UPDATE recipes SET steps=replace(steps,:duplicated,:normalized) "
+            "WHERE instr(steps,:duplicated)>0"));
+        fixRecipeSteps.bindValue(QStringLiteral(":duplicated"), duplicated);
+        fixRecipeSteps.bindValue(QStringLiteral(":normalized"), normalized);
+        if (!fixRecipeSteps.exec())
+            qWarning() << "fix duplicated recipe step numbers:"
+                       << fixRecipeSteps.lastError().text();
+    }
 
     // RDSS 知识库表
     const QStringList knowledgeTables = {
@@ -328,11 +590,99 @@ bool DatabaseManager::ensureSchema()
             "  recipe_name TEXT,"
             "  meal_label TEXT,"
             "  recommended_on TEXT NOT NULL DEFAULT (date('now','localtime')))"),
+        QStringLiteral(
+            "CREATE TABLE IF NOT EXISTS fridge_inventory ("
+            "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "  user_id INTEGER NOT NULL,"
+            "  food_name TEXT NOT NULL,"
+            "  quantity REAL NOT NULL DEFAULT 1,"
+            "  unit TEXT,"
+            "  expiry_date TEXT,"
+            "  updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime')))"),
     };
     for (const QString &sql : nactTables) {
         if (!q.exec(sql))
             qWarning() << "nact table:" << q.lastError().text();
     }
+    ensureColumn(QStringLiteral("fridge_inventory"), QStringLiteral("expiry_date"),
+                 QStringLiteral("TEXT"));
+
+    // 旧版只允许每位用户的同名食材存在一行，会把不同保质期的批次互相覆盖。
+    // SQLite 不能直接删除 UNIQUE 约束，因此只在检测到旧结构时重建该表。
+    QSqlQuery fridgeSchema(db);
+    fridgeSchema.prepare(QStringLiteral(
+        "SELECT sql FROM sqlite_master WHERE type='table' AND name='fridge_inventory'"));
+    QString fridgeTableSql;
+    if (fridgeSchema.exec() && fridgeSchema.next())
+        fridgeTableSql = fridgeSchema.value(0).toString();
+    fridgeSchema.finish();
+    QString compactSchema = fridgeTableSql.toLower();
+    compactSchema.remove(QRegularExpression(QStringLiteral("\\s+")));
+    bool hasLegacyUnique = compactSchema.contains(QStringLiteral("unique(user_id,food_name)"));
+    if (!hasLegacyUnique) {
+        QSqlQuery indexes(db);
+        if (indexes.exec(QStringLiteral("PRAGMA index_list(fridge_inventory)"))) {
+            while (indexes.next() && !hasLegacyUnique) {
+                if (!indexes.value(2).toBool())
+                    continue;
+                QString indexName = indexes.value(1).toString();
+                indexName.replace(QLatin1Char('\''), QStringLiteral("''"));
+                QSqlQuery columns(db);
+                QStringList names;
+                if (columns.exec(QStringLiteral("PRAGMA index_info('%1')").arg(indexName))) {
+                    while (columns.next())
+                        names.append(columns.value(2).toString().toLower());
+                }
+                columns.finish();
+                hasLegacyUnique = names.size() == 2
+                                  && names.contains(QStringLiteral("user_id"))
+                                  && names.contains(QStringLiteral("food_name"));
+            }
+        }
+        indexes.finish();
+    }
+    if (hasLegacyUnique) {
+        // 结束所有仍占用 sqlite_master / 旧表的查询，避免 Windows 下 ALTER TABLE
+        // 因 schema lock 失败后静默保留旧 UNIQUE 约束。
+        q.finish();
+        cnt.finish();
+        if (!db.transaction()) {
+            qWarning() << "fridge schema migration: cannot start transaction" << db.lastError().text();
+        } else {
+            QSqlQuery migrate(db);
+            const QStringList migration = {
+                QStringLiteral("ALTER TABLE fridge_inventory RENAME TO fridge_inventory_legacy"),
+                QStringLiteral(
+                    "CREATE TABLE fridge_inventory ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, "
+                    "food_name TEXT NOT NULL, quantity REAL NOT NULL DEFAULT 1, unit TEXT, "
+                    "expiry_date TEXT, updated_at TEXT NOT NULL DEFAULT (datetime('now','localtime')))"),
+                QStringLiteral(
+                    "INSERT INTO fridge_inventory(id,user_id,food_name,quantity,unit,expiry_date,updated_at) "
+                    "SELECT id,user_id,food_name,quantity,IFNULL(unit,''),IFNULL(expiry_date,''),updated_at "
+                    "FROM fridge_inventory_legacy"),
+                QStringLiteral("DROP TABLE fridge_inventory_legacy"),
+            };
+            bool migrated = true;
+            for (const QString &sql : migration) {
+                if (!migrate.exec(sql)) {
+                    qWarning() << "fridge schema migration:" << migrate.lastError().text();
+                    migrated = false;
+                    break;
+                }
+            }
+            if (migrated) {
+                if (!db.commit())
+                    qWarning() << "fridge schema migration commit:" << db.lastError().text();
+            } else {
+                db.rollback();
+            }
+        }
+    }
+    if (!q.exec(QStringLiteral(
+            "CREATE INDEX IF NOT EXISTS idx_fridge_inventory_batch "
+            "ON fridge_inventory(user_id, food_name, expiry_date, unit)")))
+        qWarning() << "fridge batch index:" << q.lastError().text();
 
     auto seedFoodNutrientByName = [&](const QString &nutrient, const QStringList &nameLikes,
                                       const QString &level) {
@@ -422,6 +772,110 @@ bool DatabaseManager::ensureSchema()
         mapDef(QStringLiteral("缺维生素D"), QStringLiteral("维生素D"));
         mapDef(QStringLiteral("缺维生素B12"), QStringLiteral("维生素B12"));
         mapDef(QStringLiteral("蛋白质不足"), QStringLiteral("蛋白质"));
+    }
+
+    // 菜品角色修正。饼类不能仅凭“饼”字判为主食。
+    {
+        QSqlQuery fix(db);
+        if (!fix.exec(QStringLiteral(
+                "UPDATE recipes SET dish_role='snack' "
+                "WHERE name IN ('土豆可乐饼','可乐土豆饼','可乐饼') "
+                "   OR name LIKE '%可乐饼%'"))) {
+            qWarning() << "fix snack roles:" << fix.lastError().text();
+        }
+        fix.exec(QStringLiteral(
+            "UPDATE recipes SET dish_role='staple' WHERE name='白米饭'"));
+        fix.exec(QStringLiteral(
+            "UPDATE recipes SET dish_role='meat',category='午餐' "
+            "WHERE name LIKE '%肉饼%' OR name LIKE '%海鲜饼%'"));
+        fix.exec(QStringLiteral(
+            "UPDATE recipes SET dish_role='vegetable',category='晚餐' "
+            "WHERE name LIKE '%土豆饼%' OR name LIKE '%香椿饼%'"));
+        // 松饼/蛋糕保留早餐适用性，但不进入午餐、晚餐的 staple 候选池。
+        fix.exec(QStringLiteral(
+            "UPDATE recipes SET dish_role='dessert',category='早餐' "
+            "WHERE name LIKE '%松饼%' OR name LIKE '%蛋糕%'"));
+    }
+
+    // 公共菜谱去重：优先保留原料条目多、步骤完整、已核验的记录，
+    // 并迁移收藏、个人库关联和推荐历史。用户自建食谱不参与公共去重。
+    {
+        QStringList duplicateNames;
+        QSqlQuery names(db);
+        if (names.exec(QStringLiteral(
+                "SELECT name FROM recipes WHERE IFNULL(source_ref,'') NOT LIKE 'USER:%%' "
+                "GROUP BY name HAVING COUNT(*)>1"))) {
+            while (names.next())
+                duplicateNames.append(names.value(0).toString());
+        }
+
+        if (!duplicateNames.isEmpty() && db.transaction()) {
+            bool ok = true;
+            for (const QString &name : duplicateNames) {
+                QSqlQuery candidates(db);
+                candidates.prepare(QStringLiteral(
+                    "SELECT r.id,"
+                    "(SELECT COUNT(*) FROM recipe_foods rf WHERE rf.recipe_id=r.id) AS ingredient_count,"
+                    "LENGTH(IFNULL(r.steps,'')) AS step_length,"
+                    "CASE WHEN IFNULL(r.nutrition_verified_at,'')<>'' THEN 1 ELSE 0 END AS verified "
+                    "FROM recipes r WHERE r.name=:name "
+                    "AND IFNULL(r.source_ref,'') NOT LIKE 'USER:%%' "
+                    "ORDER BY ingredient_count DESC,step_length DESC,verified DESC,r.id ASC"));
+                candidates.bindValue(QStringLiteral(":name"), name);
+                QList<int> ids;
+                if (candidates.exec()) {
+                    while (candidates.next())
+                        ids.append(candidates.value(0).toInt());
+                }
+                if (ids.size() < 2)
+                    continue;
+                const int keepId = ids.takeFirst();
+                for (const int duplicateId : ids) {
+                    auto run = [&](const QString &sql) {
+                        QSqlQuery query(db);
+                        query.prepare(sql);
+                        query.bindValue(QStringLiteral(":keep"), keepId);
+                        query.bindValue(QStringLiteral(":duplicate"), duplicateId);
+                        if (!query.exec()) {
+                            qWarning() << "recipe dedup:" << query.lastError().text();
+                            ok = false;
+                        }
+                    };
+                    run(QStringLiteral(
+                        "INSERT OR IGNORE INTO user_favorites(user_id,item_type,item_id,created_at) "
+                        "SELECT user_id,'recipe',:keep,COALESCE(NULLIF(created_at,''),datetime('now','localtime')) "
+                        "FROM user_favorites WHERE item_type='recipe' AND item_id=:duplicate"));
+                    run(QStringLiteral(
+                        "INSERT OR IGNORE INTO favorites(user_id,recipe_id,created_at) "
+                        "SELECT user_id,:keep,COALESCE(NULLIF(created_at,''),datetime('now','localtime')) "
+                        "FROM favorites WHERE recipe_id=:duplicate"));
+                    run(QStringLiteral(
+                        "INSERT OR IGNORE INTO user_recipe_library(user_id,recipe_id,source_type,source_url,created_at) "
+                        "SELECT user_id,:keep,source_type,source_url,created_at "
+                        "FROM user_recipe_library WHERE recipe_id=:duplicate"));
+                    run(QStringLiteral(
+                        "UPDATE user_recommendation_history SET recipe_id=:keep WHERE recipe_id=:duplicate"));
+                    for (const QString &sql : {
+                             QStringLiteral("DELETE FROM user_favorites WHERE item_type='recipe' AND item_id=:duplicate"),
+                             QStringLiteral("DELETE FROM favorites WHERE recipe_id=:duplicate"),
+                             QStringLiteral("DELETE FROM user_recipe_library WHERE recipe_id=:duplicate"),
+                             QStringLiteral("DELETE FROM recipe_foods WHERE recipe_id=:duplicate"),
+                             QStringLiteral("DELETE FROM recipes WHERE id=:duplicate")})
+                        run(sql);
+                }
+            }
+            if (ok)
+                db.commit();
+            else
+                db.rollback();
+        }
+
+        QSqlQuery uniqueIndex(db);
+        if (!uniqueIndex.exec(QStringLiteral(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_recipes_public_unique_name ON recipes(name) "
+                "WHERE IFNULL(source_ref,'') NOT LIKE 'USER:%%'"))) {
+            qWarning() << "public recipe unique index:" << uniqueIndex.lastError().text();
+        }
     }
 
     return true;

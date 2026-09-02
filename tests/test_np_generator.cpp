@@ -16,16 +16,7 @@ static Recipe recipe(int id, const QString &name, const QString &role, double ca
     return r;
 }
 
-static bool balanced(const MealSlot &meal)
-{
-    int meat = 0, vegetable = 0, staple = 0;
-    for (const Recipe &r : meal.dishes) {
-        meat += r.dishRole == QStringLiteral("meat");
-        vegetable += r.dishRole == QStringLiteral("vegetable");
-        staple += r.dishRole == QStringLiteral("staple");
-    }
-    return meat >= 1 && vegetable >= 1 && staple == 1;
-}
+static bool balanced(const MealSlot &meal) { return meal.hasBalancedMainMeal(); }
 
 int main(int argc, char *argv[])
 {
@@ -54,11 +45,63 @@ int main(int argc, char *argv[])
 
     NPGenerator generator(user, candidates);
     const RecommendResult plan = generator.generateDailyPlan();
-    const bool ok = plan.valid && balanced(plan.lunch) && balanced(plan.dinner);
+    const double planCalories = plan.breakfast.totalCalories() + plan.lunch.totalCalories()
+                                + plan.dinner.totalCalories();
+    const bool ok = plan.valid && balanced(plan.lunch) && balanced(plan.dinner)
+                    && planCalories <= user.calorieTarget * 1.10;
     if (!ok) {
         qCritical() << "main meal structure invalid";
         return 1;
     }
     qInfo() << "NP main meal structure passed";
+
+    QList<ScoredRecipe> dessertBreakfastCandidates;
+    for (const ScoredRecipe &candidate : candidates) {
+        if (candidate.recipe.dishRole != QLatin1String("breakfast"))
+            dessertBreakfastCandidates.append(candidate);
+    }
+    ScoredRecipe cake;
+    cake.recipe = recipe(id++, QStringLiteral("松饼"), QStringLiteral("dessert"), 280);
+    cake.baseScore = 50.0;
+    dessertBreakfastCandidates.append(cake);
+    NPGenerator dessertBreakfastGenerator(user, dessertBreakfastCandidates);
+    const RecommendResult dessertBreakfastPlan = dessertBreakfastGenerator.generateDailyPlan();
+    const bool dessertUsedAtBreakfast = dessertBreakfastPlan.valid
+        && !dessertBreakfastPlan.breakfast.dishes.isEmpty()
+        && dessertBreakfastPlan.breakfast.dishes.first().dishRole == QLatin1String("dessert")
+        && balanced(dessertBreakfastPlan.lunch)
+        && balanced(dessertBreakfastPlan.dinner);
+    if (!dessertUsedAtBreakfast) {
+        qCritical() << "dessert breakfast fallback invalid";
+        return 1;
+    }
+    qInfo() << "Dessert can be breakfast but not lunch/dinner staple";
+
+    // 高蛋白/营养加分不能越过硬热量预算。模拟数据库中 900 kcal 级菜品，
+    // 连续生成多次，确保随机候选也不会再产生严重超标方案。
+    for (const QString &role : {QStringLiteral("meat"), QStringLiteral("vegetable"),
+                                QStringLiteral("staple"), QStringLiteral("drink")}) {
+        for (int i = 0; i < 6; ++i) {
+            ScoredRecipe high;
+            high.recipe = recipe(id++, QStringLiteral("高热量候选%1-%2").arg(role).arg(i),
+                                 role, 820.0 + i * 35.0);
+            high.recipe.totalProtein = 55.0;
+            high.baseScore = 200.0;
+            high.nutritionBoost = 100.0;
+            candidates.append(high);
+        }
+    }
+    NPGenerator guardedGenerator(user, candidates);
+    for (int run = 0; run < 30; ++run) {
+        const RecommendResult guarded = guardedGenerator.generateDailyPlan();
+        const double calories = guarded.breakfast.totalCalories()
+                                + guarded.lunch.totalCalories()
+                                + guarded.dinner.totalCalories();
+        if (!guarded.valid || calories > user.calorieTarget * 1.10) {
+            qCritical() << "calorie guard failed" << run << calories;
+            return 1;
+        }
+    }
+    qInfo() << "NP hard calorie budget passed";
     return 0;
 }

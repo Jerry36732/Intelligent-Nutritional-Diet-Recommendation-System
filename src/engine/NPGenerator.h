@@ -31,7 +31,12 @@ private:
                         const QSet<int> &used,
                         bool allowReuseStaple = false) const;
     MealSlot composeBreakfast(double targetCal, QSet<int> &used) const;
-    MealSlot composeMainMeal(const QString &label, double targetCal, QSet<int> &used) const;
+    MealSlot composeMainMeal(const QString &label,
+                             double targetCal,
+                             QSet<int> &used,
+                             bool forceWhiteRice = false) const;
+    Recipe findWhiteRice() const;
+    void ensureLunchOrDinnerHasWhiteRice(RecommendResult &plan) const;
 
     User m_user;
     QList<ScoredRecipe> m_candidates;

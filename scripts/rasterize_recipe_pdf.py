@@ -1,9 +1,15 @@
+import argparse
 from pathlib import Path
 import pypdfium2 as pdfium
 from PIL import Image, ImageDraw
 
-root = Path(r"C:\Users\ROG\Documents\System\食谱数据\rendered_word")
-pdf_path = root / "食谱数据手册.pdf"
+parser = argparse.ArgumentParser()
+parser.add_argument("pdf", nargs="?", type=Path, default=Path(r"C:\Users\ROG\Documents\System\食谱数据\rendered_word\食谱数据手册.pdf"))
+parser.add_argument("--output-dir", type=Path, default=None)
+args = parser.parse_args()
+
+pdf_path = args.pdf.resolve()
+root = args.output_dir.resolve() if args.output_dir else pdf_path.parent
 pages_dir = root / "pages"
 contacts_dir = root / "contacts"
 pages_dir.mkdir(parents=True, exist_ok=True)

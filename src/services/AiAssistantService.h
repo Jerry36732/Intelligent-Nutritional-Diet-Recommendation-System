@@ -5,6 +5,8 @@
 #include "../entities/User.h"
 
 #include <QObject>
+#include <QList>
+#include <QPair>
 #include <QString>
 
 struct AiPreferenceUpdate
@@ -29,6 +31,8 @@ public:
     void analyzeUserMessage(const User &user,
                             const QString &userMessage,
                             const RecommendResult &currentPlan = RecommendResult{});
+    void rememberExchange(const QString &userMessage, const QString &assistantReply);
+    void resetConversation();
 
 signals:
     void finished(const AiPreferenceUpdate &result);
@@ -47,6 +51,7 @@ private:
     User m_pendingUser;
     QString m_pendingMessage;
     RecommendResult m_currentPlan;
+    QList<QPair<QString, QString>> m_history;
 };
 
 #endif // AIASSISTANTSERVICE_H

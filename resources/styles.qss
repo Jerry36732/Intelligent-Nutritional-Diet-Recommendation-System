@@ -1,640 +1,3484 @@
-/* 膳衡 SMART DIET — EvolveUI 启发的浅色主题
- * 参考 https://github.com/sudoevolve/EvolveUI 的 ETheme：
- * focusColor #00C4B3 · secondary #F8FAFD · primary #FFFFFF · 柔和阴影与圆角
- */
-* {
-    font-family: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
-    outline: none;
-}
+/* 膳衡桌面设计系统：专业、安静、紧凑 */
+* { font-family: "__SHANHENG_BODY_FONT__"; font-size: 14px; color: #202522; outline: none; }
+QMainWindow, QDialog, QWidget#CentralRoot, QStackedWidget { background: #F5F5F1; }
+QToolTip { background: #202522; color: #FFFFFF; border: none; padding: 5px 8px; }
 
-QMainWindow, QDialog {
-    background-color: #F8FAFD;
-    color: #1a1f2c;
-}
-QWidget#CentralRoot { background: #F8FAFD; }
+/* 主框架 */
+QFrame#Sidebar { background: #FFFFFF; border: none; border-right: 1px solid #DDE2DE; min-width: 184px; max-width: 184px; }
+QLabel#BrandMark { color: #28594A; font-size: 22px; font-weight: 700; }
+QLabel#BrandSub { color: #68716C; font-size: 11px; }
+QLabel#WorkspaceLabel { color: #8B938F; font-size: 12px; padding: 0 8px 4px; }
+QPushButton[class="NavButton"] { background: transparent; border: none; border-left: 3px solid transparent; border-radius: 4px; color: #4F5853; text-align: left; padding: 8px 12px; font-size: 14px; }
+QPushButton[class="NavButton"]:hover { background: #F1F4F1; color: #28594A; }
+QPushButton[class="NavButton"]:pressed { background: #E3E9E5; }
+QPushButton[class="NavButton"]:checked { background: #E7EFEA; border-left-color: #28594A; color: #234C3F; font-weight: 600; }
+QPushButton[class="NavButton"]:focus { border: 1px solid #658779; border-left: 3px solid #28594A; }
+QLabel#ProfileMiniMeta { color: #7A837E; font-size: 11px; }
+QFrame#ProfileMini { background: #F7F8F5; border: 1px solid #DDE2DE; border-radius: 6px; }
+QFrame#ProfileMini:hover { background: #EEF2EE; border-color: #AEBBB4; }
+QLabel#ProfileMiniName { color: #202522; font-size: 13px; font-weight: 600; }
+QFrame#TopBar { background: #FFFFFF; border: none; border-bottom: 1px solid #DDE2DE; min-height: 62px; }
+QLabel#TopDate { color: #7A837E; font-size: 12px; }
+QLabel#TopTitle { color: #202522; font-size: 22px; font-weight: 600; }
+QLabel#DbBadge { color: #587266; font-size: 12px; padding: 4px 6px; }
+QLabel#DbBadge[connected="false"] { color: #B5473C; }
+QPushButton#SwitchUserBtn { background: transparent; border: 1px solid #C9D0CC; border-radius: 6px; color: #35403A; padding: 7px 12px; font-weight: 600; }
+QPushButton#SwitchUserBtn:hover { background: #F1F4F1; border-color: #82988D; }
+QPushButton#SwitchUserBtn:pressed { background: #E3E9E5; }
+QPushButton#SwitchUserBtn:focus { border: 2px solid #658779; padding: 6px 11px; }
+QLabel#FooterDisclaimer { color: #8A928E; font-size: 11px; padding: 6px 12px; }
 
-/* Shell */
-QFrame#Sidebar {
-    background: #FFFFFF;
-    border-right: 1px solid #e6ebf2;
-    min-width: 228px;
-    max-width: 228px;
-}
-QLabel#BrandMark {
-    color: #0f766e;
-    font-family: "Georgia", "SimSun", "Songti SC", serif;
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: 4px;
-}
-QLabel#BrandSub {
-    color: #8b95a8;
-    font-size: 9px;
-    letter-spacing: 2px;
-    font-family: "Consolas", "Segoe UI", monospace;
-}
-QLabel#WorkspaceLabel {
-    color: #9aa3b2;
-    font-family: "Consolas", monospace;
-    font-size: 10px;
-    letter-spacing: 1.2px;
-    padding: 0 12px 3px;
-}
-QPushButton[class="NavButton"] {
-    background: transparent;
-    border: none;
-    border-radius: 12px;
-    color: #667085;
-    text-align: left;
-    padding: 4px;
-    font-size: 13px;
-}
-QPushButton[class="NavButton"]:hover { background: #F0FDFA; }
-QPushButton[class="NavButton"]:checked {
-    background: #E6FFFA;
-    border: 1px solid #99F6E4;
-}
-QLabel#NavLabel { color: #475467; font-size: 13px; font-weight: 600; background: transparent; }
-QPushButton[class="NavButton"]:checked QLabel#NavLabel { color: #0f766e; font-weight: 700; }
-QLabel#NavBadge {
-    color: #98A2B3;
-    font-family: "Consolas", monospace;
-    font-size: 10px;
-    background: transparent;
-}
-QPushButton[class="NavButton"]:checked QLabel#NavBadge { color: #00C4B3; }
-
-QFrame#OfflineCard {
-    background: #F8FAFD;
-    border: 1px solid #E4E7EC;
-    border-radius: 12px;
-}
-QLabel#OfflineTitle { color: #0f766e; font-size: 12px; font-weight: 700; }
-QLabel#OfflineBody, QLabel#ProfileMiniMeta { color: #98A2B3; font-size: 10px; }
-QFrame#ProfileMini {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 12px;
-}
-QLabel#ProfileMiniName { color: #1D2939; font-size: 13px; font-weight: 700; }
-
-QFrame#TopBar {
-    background: #FFFFFF;
-    border-bottom: 1px solid #E4E7EC;
-    min-height: 70px;
-}
-QLabel#TopDate { color: #98A2B3; font-size: 11px; font-family: "Consolas", monospace; }
-QLabel#TopTitle {
-    color: #101828;
-    font-family: "Georgia", "SimSun", "Songti SC", serif;
-    font-size: 20px;
-    font-weight: 700;
-}
-QLabel#DbBadge {
-    background: #E6FFFA;
-    color: #0f766e;
-    border: 1px solid #99F6E4;
-    border-radius: 999px;
-    padding: 5px 12px;
-    font-size: 10px;
-    font-weight: 700;
-}
-QLabel#DbBadge[connected="false"] {
-    background: #FEF3F2;
-    color: #B42318;
-    border-color: #FECDCA;
-}
-QPushButton#SwitchUserBtn {
-    background: #FFFFFF;
-    border: 1px solid #D0D5DD;
-    border-radius: 10px;
-    color: #344054;
-    padding: 7px 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-QPushButton#SwitchUserBtn:hover {
-    background: #F0FDFA;
-    border-color: #5EEAD4;
-    color: #0f766e;
-}
-QLabel#FooterDisclaimer { color: #98A2B3; font-size: 10px; padding: 10px; }
-
-/* Controls — EvolveUI focus teal */
-QPushButton[class="PrimaryButton"] {
-    background: #00C4B3;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 12px;
-    padding: 11px 18px;
-    font-size: 13px;
-    font-weight: 700;
-}
-QPushButton[class="PrimaryButton"]:hover { background: #0d9488; }
-QPushButton[class="PrimaryButton"]:disabled { background: #CCFBF1; color: #5EEAD4; }
-QPushButton[class="GhostButton"] {
-    background: #FFFFFF;
-    border: 1px solid #D0D5DD;
-    border-radius: 12px;
-    color: #344054;
-    padding: 9px 14px;
-    font-size: 12px;
-    font-weight: 600;
-}
-QPushButton[class="GhostButton"]:hover {
-    background: #F0FDFA;
-    border-color: #5EEAD4;
-    color: #0f766e;
-}
-QPushButton[class="CoralButton"] {
-    background: #F97066;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 18px;
-    font-weight: 700;
-}
-QPushButton[class="HeartButton"] {
-    background: transparent;
-    border: none;
-    color: #D0D5DD;
-    font-size: 18px;
-    padding: 4px;
-}
-QPushButton[class="HeartButton"]:checked,
-QPushButton[class="HeartButton"]:hover { color: #F97066; }
-
-QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QTextEdit {
-    background: #FFFFFF;
-    border: 1px solid #D0D5DD;
-    border-radius: 10px;
-    padding: 9px 12px;
-    color: #1D2939;
-    selection-background-color: #00C4B3;
-    selection-color: #FFFFFF;
-}
-QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QTextEdit:focus {
-    border: 2px solid #00C4B3;
-    padding: 8px 11px;
-}
+/* 通用控件与交互状态 */
+QPushButton[class="PrimaryButton"], QPushButton#LoginPrimaryAction { background: #28594A; color: #FFFFFF; border: 1px solid #28594A; border-radius: 6px; padding: 9px 16px; font-weight: 600; }
+QPushButton[class="PrimaryButton"]:hover, QPushButton#LoginPrimaryAction:hover { background: #34705D; }
+QPushButton[class="PrimaryButton"]:pressed, QPushButton#LoginPrimaryAction:pressed { background: #1F473B; }
+QPushButton[class="PrimaryButton"]:focus, QPushButton#LoginPrimaryAction:focus { border: 2px solid #86A497; padding: 8px 15px; }
+QPushButton[class="PrimaryButton"]:disabled, QPushButton#LoginPrimaryAction:disabled { background: #D5DBD7; color: #8B938F; border-color: #D5DBD7; }
+QPushButton[class="GhostButton"], QPushButton[class="CoralButton"] { background: #FFFFFF; border: 1px solid #C9D0CC; border-radius: 6px; color: #35403A; padding: 8px 13px; font-weight: 600; }
+QPushButton[class="GhostButton"]:hover, QPushButton[class="CoralButton"]:hover { background: #F1F4F1; border-color: #82988D; }
+QPushButton[class="GhostButton"]:pressed, QPushButton[class="CoralButton"]:pressed { background: #E3E9E5; }
+QPushButton[class="GhostButton"]:focus, QPushButton[class="CoralButton"]:focus { border: 2px solid #658779; padding: 7px 12px; }
+QPushButton[class="GhostButton"]:disabled { color: #9DA5A1; background: #F3F4F2; }
+QPushButton[class="HeartButton"] { background: transparent; border: none; color: #8A928E; font-size: 18px; padding: 4px; }
+QPushButton[class="HeartButton"]:hover, QPushButton[class="HeartButton"]:checked { color: #B96A3E; }
+QPushButton[class="HeartButton"]:focus { border: 1px solid #82988D; border-radius: 4px; }
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QTextEdit, QPlainTextEdit { background: #FFFFFF; border: 1px solid #C9D0CC; border-radius: 5px; padding: 8px 10px; color: #202522; selection-background-color: #28594A; selection-color: #FFFFFF; }
+QLineEdit:hover, QComboBox:hover, QSpinBox:hover, QDoubleSpinBox:hover, QTextEdit:hover, QPlainTextEdit:hover { border-color: #9EA9A3; }
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QTextEdit:focus, QPlainTextEdit:focus { border: 2px solid #658779; padding: 7px 9px; }
+QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled, QDoubleSpinBox:disabled { background: #ECEEEC; color: #8B938F; }
+QLineEdit[error="true"], QComboBox[error="true"] { border: 2px solid #B5473C; }
 QComboBox::drop-down { border: none; width: 24px; }
-QComboBox QAbstractItemView {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    selection-background-color: #E6FFFA;
-    selection-color: #0f766e;
-}
+QComboBox QAbstractItemView { background: #FFFFFF; border: 1px solid #C9D0CC; selection-background-color: #E7EFEA; selection-color: #202522; }
+QCheckBox { spacing: 8px; color: #35403A; }
+QCheckBox::indicator { width: 16px; height: 16px; border: 1px solid #9EA9A3; border-radius: 3px; background: #FFFFFF; }
+QCheckBox::indicator:checked { background: #28594A; border-color: #28594A; }
 
-/* Cards */
-QFrame#RecipeCard, QFrame[class="RecipeCard"], QFrame[class="PanelCard"] {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 16px;
-}
-QLabel[class="MealTag"] {
-    background: #E6FFFA;
-    color: #0f766e;
-    border-radius: 8px;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: 700;
-}
-QLabel[class="MealTag"][meal="午餐"] { background: #FEF3F2; color: #B42318; }
-QLabel[class="MealTag"][meal="晚餐"] { background: #EFF8FF; color: #175CD3; }
-QLabel[class="CardTitle"], QLabel[class="SectionTitle"] {
-    color: #101828;
-    font-family: "Georgia", "SimSun", "Songti SC", serif;
-    font-weight: 700;
-}
-QLabel[class="CardTitle"] { font-size: 16px; }
-QLabel[class="SectionTitle"] { font-size: 19px; }
-QLabel[class="CardMeta"], QLabel[class="HintText"] { color: #667085; font-size: 12px; }
-QLabel[class="NutrientChip"] {
-    background: #F8FAFD;
-    color: #475467;
-    border: 1px solid #E4E7EC;
-    border-radius: 8px;
-    padding: 5px 8px;
-    font-size: 10px;
-    font-weight: 600;
-}
-QFrame#MetricStrip {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 16px;
-}
-QLabel[class="MetricValue"] { color: #0f766e; font-size: 22px; font-weight: 700; }
-QLabel#MetricKcal { color: #00C4B3; font-size: 26px; font-weight: 800; }
-QLabel[class="MetricLabel"] { color: #98A2B3; font-size: 10px; }
-QFrame[class="MetricDivider"] { background: #E4E7EC; max-width: 1px; min-width: 1px; }
+/* 字体层级 */
+QLabel[class="SectionTitle"], QLabel#DialogTitle, QLabel#FoodPageTitle, QLabel#ProfileName, QLabel#LoginFormTitle { color: #202522; font-size: 20px; font-weight: 600; }
+QLabel#FoodPageTitle { font-size: 26px; }
+QLabel[class="CardTitle"] { color: #202522; font-size: 16px; font-weight: 600; }
+QLabel[class="CardMeta"], QLabel[class="HintText"], QLabel[class="LoginFormCopy"], QLabel[class="LoginTip"] { color: #68716C; font-size: 12px; }
+QLabel#SectionKicker, QLabel#FoodEyebrow, QLabel#ProfileEyebrow, QLabel#FoodCategorySectionTitle { color: #68716C; font-size: 12px; font-weight: 600; }
+QLabel#DashboardHeroTitle { color: #202522; font-size: 26px; font-weight: 600; }
+QLabel#DashboardSubcopy { color: #68716C; font-size: 13px; }
 
-QLabel#DashboardHeroTitle {
-    color: #101828;
-    font-family: "Georgia", "SimSun", "Songti SC", serif;
-    font-size: 34px;
-    font-weight: 700;
-    letter-spacing: -1px;
-}
-QLabel#DashboardSubcopy { color: #667085; font-size: 13px; }
-QLabel#SectionKicker {
-    color: #00C4B3;
-    font-family: "Consolas", monospace;
-    font-size: 10px;
-    letter-spacing: 1.4px;
-    font-weight: 700;
-}
+/* 摘要与餐次 */
+QFrame#RecipeCard, QFrame[class="RecipeCard"] { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 7px; min-height: 92px; }
+QFrame#RecipeCard:hover { border-color: #AEBBB4; }
+QFrame#RecipeCard QPushButton[class="GhostButton"] { padding: 5px 10px; }
+QFrame#RecipeCard QPushButton[class="HeartButton"] { padding: 0 3px; }
+QFrame[class="PanelCard"] { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 7px; }
+QLabel[class="MealTag"] { color: #28594A; background: transparent; padding: 0; font-size: 12px; font-weight: 700; }
+QLabel[class="MealTag"][meal="午餐"] { color: #9A5735; }
+QLabel[class="MealTag"][meal="晚餐"] { color: #4E6479; }
+QLabel[class="NutrientChip"] { background: transparent; color: #4F5853; border: none; padding: 1px 8px 1px 0; font-size: 12px; }
+QFrame#MetricStrip, QFrame#ProfileStats { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 7px; }
+QLabel[class="MetricValue"] { color: #28594A; font-size: 22px; font-weight: 700; }
+QLabel#MetricKcal { color: #28594A; font-size: 24px; font-weight: 700; }
+QLabel[class="MetricLabel"] { color: #7A837E; font-size: 11px; }
+QFrame[class="MetricDivider"] { background: #DDE2DE; max-width: 1px; min-width: 1px; }
+QFrame#RuleCard { background: #F0F3EF; border: none; border-left: 3px solid #8DA397; border-radius: 4px; }
+QLabel[class="RuleLetter"] { color: #28594A; font-size: 16px; font-weight: 700; }
 
-/* Table */
-QTableWidget {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 12px;
-    gridline-color: #F2F4F7;
-    selection-background-color: #E6FFFA;
-    selection-color: #0f766e;
-    alternate-background-color: #F8FAFD;
-}
-QHeaderView::section {
-    background: #F8FAFD;
-    color: #475467;
-    border: none;
-    border-bottom: 1px solid #E4E7EC;
-    padding: 10px;
-    font-weight: 700;
-    font-size: 11px;
-}
-QTableWidget::item { padding: 6px; border-bottom: 1px solid #F2F4F7; }
-QScrollBar:vertical { background: transparent; width: 8px; margin: 2px; }
-QScrollBar::handle:vertical { background: #D0D5DD; border-radius: 4px; min-height: 24px; }
+/* 表格与食材筛选 */
+QLineEdit#FoodSearchInput { min-height: 22px; }
+QLabel#FoodCountLabel { color: #4F5853; background: transparent; border: none; padding: 4px 0; font-size: 12px; }
+QFrame#FoodCategoryPanel { background: transparent; border: none; }
+QPushButton[class="CategoryFilter"] { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 5px; color: #4F5853; padding: 7px 9px; text-align: left; font-size: 12px; }
+QPushButton[class="CategoryFilter"]:hover { background: #F1F4F1; border-color: #AEBBB4; }
+QPushButton[class="CategoryFilter"]:checked { background: #E7EFEA; border-color: #7F9A8D; color: #234C3F; font-weight: 600; }
+QPushButton[class="CategoryFilter"]:focus { border: 2px solid #658779; padding: 6px 8px; }
+QTableWidget { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 5px; gridline-color: #E8EBE9; selection-background-color: #DCE8E1; selection-color: #202522; alternate-background-color: #F7F8F6; }
+QHeaderView::section { background: #EEF1EE; color: #35403A; border: none; border-bottom: 1px solid #D4DAD6; padding: 8px; font-weight: 600; }
+QTableWidget::item { padding: 6px 8px; border-bottom: 1px solid #EAEBEA; }
+QTableWidget::item:focus { border: 1px solid #658779; }
+QScrollBar:vertical { background: #F0F2F0; width: 10px; margin: 0; }
+QScrollBar::handle:vertical { background: #B4BDB8; border-radius: 4px; min-height: 28px; margin: 2px; }
+QScrollBar::handle:vertical:hover { background: #8F9A94; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
 
-QDialog QLabel#DialogTitle {
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: #101828;
-}
-QLabel#Disclaimer { color: #98A2B3; font-size: 11px; }
-QFrame#RuleCard {
-    background: #F0FDFA;
-    border-radius: 14px;
-    border: 1px solid #99F6E4;
-}
-QLabel[class="RuleLetter"] { color: #00C4B3; font-size: 18px; font-weight: 700; }
-
-/* Food page */
-QLabel#FoodEyebrow, QLabel#ProfileEyebrow {
-    color: #00C4B3;
-    font-family: "Consolas", monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-}
-QLabel#FoodPageTitle {
-    color: #101828;
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: -1px;
-}
-QLabel#FoodCategorySectionTitle {
-    color: #667085;
-    font-family: "Consolas", monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.4px;
-}
-QLabel#FoodCountLabel {
-    background: #E6FFFA;
-    color: #0f766e;
-    border: 1px solid #99F6E4;
-    border-radius: 10px;
-    padding: 8px 12px;
-    font-size: 10px;
-    font-weight: 700;
-}
-QFrame#FoodCategoryPanel { background: transparent; border: none; }
-QPushButton[class="CategoryFilter"] {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-left: 4px solid #00C4B3;
-    border-radius: 10px;
-    color: #344054;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 10px 12px;
-    text-align: left;
-}
-QPushButton[class="CategoryFilter"]:hover {
-    background: #F0FDFA;
-    border-color: #5EEAD4;
-}
-QPushButton[class="CategoryFilter"]:checked {
-    background: #E6FFFA;
-    border-color: #00C4B3;
-    color: #0f766e;
-}
-QPushButton[class="CategoryFilter"][tone="grain"] { border-left-color: #F79009; }
-QPushButton[class="CategoryFilter"][tone="starch"] { border-left-color: #9E77ED; }
-QPushButton[class="CategoryFilter"][tone="bean"] { border-left-color: #F04438; }
-QPushButton[class="CategoryFilter"][tone="vegetable"] { border-left-color: #12B76A; }
-QPushButton[class="CategoryFilter"][tone="fungi"] { border-left-color: #15B79E; }
-QPushButton[class="CategoryFilter"][tone="fruit"] { border-left-color: #EF6820; }
-QPushButton[class="CategoryFilter"][tone="nut"] { border-left-color: #FAC515; }
-QPushButton[class="CategoryFilter"][tone="meat"] { border-left-color: #EE46BC; }
-QPushButton[class="CategoryFilter"][tone="poultry"] { border-left-color: #7A5AF8; }
-QPushButton[class="CategoryFilter"][tone="milk"] { border-left-color: #2E90FA; }
-QPushButton[class="CategoryFilter"][tone="egg"] { border-left-color: #36BFFA; }
-QPushButton[class="CategoryFilter"][tone="seafood"] { border-left-color: #F63D68; }
-QPushButton[class="CategoryFilter"][tone="drink"] { border-left-color: #16B364; }
-QPushButton[class="CategoryFilter"][tone="seasoning"] { border-left-color: #FDB022; }
-QLineEdit#FoodSearchInput {
+/* 登录与五步注册 */
+QDialog#LoginDialog { background: #E8EBEF; }
+QFrame#LoginShell {
     background: #FFFFFF;
     border: 1px solid #D0D5DD;
     border-radius: 12px;
-    padding: 11px 14px;
-    font-size: 13px;
-}
-QLineEdit#FoodSearchInput:focus {
-    border: 2px solid #00C4B3;
-    padding: 10px 13px;
-}
-
-/* Profile */
-QFrame#ProfileHero {
-    background: qlineargradient(x1:0,y1:0,x2:1,y2:1, stop:0 #E6FFFA, stop:1 #F0FDFA);
-    border: 1px solid #99F6E4;
-    border-radius: 16px;
-}
-QLabel#ProfileAvatar {
-    background: #00C4B3;
-    border: 4px solid #CCFBF1;
-    border-radius: 34px;
-    color: #FFFFFF;
-    font-family: "Georgia", serif;
-    font-size: 28px;
-    font-weight: 700;
-    min-width: 58px;
-    max-width: 58px;
-    min-height: 58px;
-    max-height: 58px;
-}
-QLabel#ProfileName {
-    color: #101828;
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 25px;
-    font-weight: 700;
-}
-QFrame#ProfileStats {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 14px;
-}
-QFrame[class="ProfileStatCard"] { background: transparent; border: none; border-right: 1px solid #E4E7EC; }
-QLabel[class="ProfileStatValue"] { color: #101828; font-size: 20px; font-weight: 700; }
-QLabel[class="ProfileStatNote"] { color: #00C4B3; font-size: 9px; }
-QLabel#FavoriteBadge {
-    background: #FEF3F2;
-    color: #B42318;
-    border-radius: 12px;
-    padding: 6px 11px;
-    font-size: 10px;
-    font-weight: 700;
-}
-QLabel#FavoriteEmpty {
-    background: #FFFFFF;
-    border: 1px dashed #D0D5DD;
-    border-radius: 12px;
-    color: #667085;
-    font-size: 12px;
-    padding: 34px;
-}
-
-/* Login — EvolveUI inspired */
-QDialog#LoginDialog {
-    background: qlineargradient(x1:0,y1:0,x2:1,y2:1,
-        stop:0 #E6FFFA, stop:.45 #F8FAFD, stop:1 #EFF8FF);
-}
-QFrame#LoginShell {
-    background: #FFFFFF;
-    border: 1px solid #E4E7EC;
-    border-radius: 22px;
 }
 QFrame#LoginStory {
-    background: qlineargradient(x1:0,y1:0,x2:.9,y2:1, stop:0 #0f766e, stop:1 #00C4B3);
-    border-top-left-radius: 21px;
-    border-bottom-left-radius: 21px;
-}
-QLabel#LoginBrand {
-    color: #FFFFFF;
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 30px;
-    font-weight: 700;
-    letter-spacing: 6px;
-}
-QLabel#LoginBrandEn, QLabel#LoginPrivacy {
-    color: #CCFBF1;
-    font-size: 10px;
-    letter-spacing: 2px;
-}
-QLabel#LoginStoryTitle {
-    color: #FFFFFF;
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 24px;
-    font-weight: 700;
-}
-QLabel#LoginStoryCopy { color: #E6FFFA; font-size: 12px; }
-QFrame#LoginFormArea {
     background: #FFFFFF;
-    border-top-right-radius: 21px;
-    border-bottom-right-radius: 21px;
+    border: none;
+    border-right: 1px solid #E4E7EC;
 }
+QLabel#LoginBrand { color: #28594A; font-size: 24px; font-weight: 700; }
+QLabel#LoginBrandEn { color: #68716C; font-size: 11px; }
+QLabel#LoginStoryTitle { color: #28594A; font-size: 15px; font-weight: 600; }
+QLabel#LoginStoryCopy, QLabel#LoginPrivacy { color: #68716C; font-size: 11px; }
+QFrame#LoginFormArea, QWidget#LoginFormPage, QStackedWidget#LoginFormStack {
+    background: #FFFFFF;
+    border: none;
+}
+QListWidget#FridgeInventoryList, QListWidget#FridgeResultList {
+    background: #FFFFFF;
+    border: 1px solid #D0D5DD;
+    border-radius: 8px;
+    padding: 4px;
+    outline: none;
+}
+QListWidget#FridgeInventoryList::item, QListWidget#FridgeResultList::item {
+    padding: 8px 10px;
+    border-radius: 4px;
+    color: #1F2937;
+}
+QListWidget#FridgeInventoryList::item:selected, QListWidget#FridgeResultList::item:selected {
+    background: #F2F4F7;
+    border-left: 3px solid #2563EB;
+    color: #111827;
+}
+QDoubleSpinBox#FridgeQtySpin {
+    background: #FFFFFF;
+    border: 1px solid #D0D5DD;
+    border-radius: 6px;
+    padding: 6px 8px;
+    color: #1F2937;
+}
+QDoubleSpinBox#FridgeQtySpin:focus {
+    border: 1px solid #2563EB;
+}
+QDoubleSpinBox#FridgeQtySpin::up-button,
+QDoubleSpinBox#FridgeQtySpin::down-button {
+    width: 0;
+    height: 0;
+    border: none;
+    background: transparent;
+}
+QFrame#FridgePanelCard {
+    background: #FFFFFF;
+    border: 1px solid #D0D5DD;
+    border-radius: 10px;
+}
+QPushButton[class="LoginTab"] { background: transparent; border: none; border-bottom: 2px solid transparent; color: #7A837E; padding: 7px 3px; font-size: 14px; font-weight: 600; }
+QPushButton[class="LoginTab"]:hover { color: #28594A; }
+QPushButton[class="LoginTab"]:checked { color: #28594A; border-bottom-color: #28594A; }
+QPushButton[class="LoginTab"]:focus { border: 1px solid #82988D; border-bottom: 2px solid #28594A; }
+QFrame#LoginRule { background: #DDE2DE; max-height: 1px; min-height: 1px; border: none; }
+QLabel[class="LoginFieldLabel"] { color: #35403A; font-size: 12px; font-weight: 600; }
+QLineEdit#LoginInput, QComboBox#LoginCombo, QDoubleSpinBox#LoginNumber { background: #FFFFFF; min-height: 28px; }
+QLabel#LoginStepLabel {
+    color: #667085;
+    background: transparent;
+    border: none;
+    padding: 4px 0 2px 0;
+    font-size: 12px;
+    font-weight: 500;
+}
+QFrame#RegProgressTrack {
+    background: #E4E7EC;
+    border: none;
+    border-radius: 2px;
+    max-height: 4px;
+    min-height: 4px;
+}
+QFrame#RegProgressFill {
+    background: #2563EB;
+    border: none;
+    border-radius: 2px;
+    max-height: 4px;
+    min-height: 4px;
+}
+QPushButton#RegBackButton {
+    background: #FFFFFF;
+    color: #2563EB;
+    border: 1px solid #2563EB;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 16px;
+}
+QPushButton#RegBackButton:hover { background: #EFF6FF; }
+QPushButton#RegBackButton:disabled {
+    color: #98A2B3;
+    border-color: #D0D5DD;
+    background: #F9FAFB;
+}
+QPushButton#RegNextButton {
+    background: #2563EB;
+    color: #FFFFFF;
+    border: 1px solid #2563EB;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 16px;
+}
+QPushButton#RegNextButton:hover { background: #1D4ED8; }
+QPushButton#RegNextButton:pressed { background: #1E40AF; }
+QLineEdit#TagSearchInput {
+    background: #FFFFFF;
+    border: 1px solid #D0D5DD;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    color: #344054;
+}
+QPushButton#TagMoreButton {
+    color: #2563EB;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 0;
+    text-align: left;
+}
+QPushButton#TagMoreButton:hover { color: #1D4ED8; }
+QLabel#LoginHint { color: #68716C; font-size: 12px; }
+QLabel#LoginHint[error="true"] { color: #B5473C; }
+QSlider#ProfileSlider::groove:horizontal { background: #DDE2DE; border-radius: 2px; height: 4px; }
+QSlider#ProfileSlider::sub-page:horizontal { background: #658779; border-radius: 2px; }
+QSlider#ProfileSlider::handle:horizontal { background: #FFFFFF; border: 2px solid #28594A; border-radius: 7px; height: 12px; width: 12px; margin: -5px 0; }
+
+/* 推荐能力 */
+QFrame#RecommendPlanPanel, QFrame#AiAssistantPanel { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 7px; }
+QLabel#RecommendSummary { background: #F4F6F3; border: none; border-left: 3px solid #8DA397; border-radius: 3px; padding: 9px 11px; color: #4F5853; }
+QLabel#RecommendReasons { background: transparent; border: none; padding: 2px 0; color: #4F5853; }
+QScrollArea#AiChatScroll { background: #F7F8F6; border: 1px solid #E1E5E2; border-radius: 5px; }
+QWidget#AiChatHost { background: transparent; }
+QFrame#ChatBubbleAi { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 6px; max-width: 320px; }
+QFrame#ChatBubbleUser { background: #E7EFEA; border: 1px solid #C7D5CD; border-radius: 6px; max-width: 300px; }
+QLabel#ChatBubbleWho { color: #68716C; font-size: 11px; font-weight: 600; }
+QLabel#ChatBubbleText { color: #202522; font-size: 13px; }
+QFrame#AiInputBar { background: #FFFFFF; border: 1px solid #C9D0CC; border-radius: 6px; }
+QLineEdit#AiChatInput { background: transparent; border: none; padding: 6px 4px; }
+QPushButton[class="SuggestChip"], QPushButton[class="TagChip"] { background: #FFFFFF; color: #4F5853; border: 1px solid #C9D0CC; border-radius: 5px; padding: 6px 10px; font-size: 12px; }
+QPushButton[class="SuggestChip"]:hover, QPushButton[class="TagChip"]:hover { background: #F1F4F1; border-color: #8FA198; }
+QPushButton[class="TagChip"]:checked { background: #E7EFEA; color: #234C3F; border-color: #7F9A8D; font-weight: 600; }
+QPushButton[class="TagChip"]:focus, QPushButton[class="SuggestChip"]:focus { border: 2px solid #658779; padding: 5px 9px; }
+QLabel#TagGroupTitle { color: #202522; font-size: 14px; font-weight: 600; }
+
+/* 档案、设置与详情 */
+QFrame#ProfileHero { background: #FFFFFF; border: none; border-bottom: 1px solid #DDE2DE; border-radius: 0; }
+QLabel#ProfileAvatar { background: #E7EFEA; border: 1px solid #B9C8C0; border-radius: 5px; color: #28594A; font-size: 20px; font-weight: 700; min-width: 44px; max-width: 44px; min-height: 44px; max-height: 44px; }
+QFrame[class="ProfileStatCard"] { background: transparent; border: none; border-right: 1px solid #DDE2DE; }
+QLabel[class="ProfileStatValue"] { color: #202522; font-size: 20px; font-weight: 700; }
+QLabel[class="ProfileStatNote"] { color: #587266; font-size: 11px; }
+QFrame#ProfileHealthCard { background: #FFFFFF; border: 1px solid #DDE2DE; border-radius: 7px; }
+QLabel#HealthDimTitle { color: #4F5853; font-size: 12px; font-weight: 600; }
+QLabel#HealthChip { background: #EEF2EE; color: #35403A; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; }
+QLabel#FavoriteBadge { color: #7C5138; background: #F4EAE4; border-radius: 4px; padding: 5px 8px; font-size: 11px; font-weight: 600; }
+QLabel#FavoriteEmpty { background: #FFFFFF; border: 1px dashed #C9D0CC; border-radius: 5px; color: #68716C; padding: 24px; }
+QLabel#Disclaimer { color: #7A837E; font-size: 11px; }
+QFrame#RecipeDetailSection { background: transparent; border: none; border-top: 1px solid #DDE2DE; border-radius: 0; }
+QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; border: none; }
+QStatusBar { background: #FFFFFF; color: #68716C; border-top: 1px solid #DDE2DE; }
+
+/* -------------------------------------------------------------------------
+   版面设计 v2 精确化覆盖层（1024×768 基准）
+   ------------------------------------------------------------------------- */
+* { font-family: "__SHANHENG_BODY_FONT__"; color: #0B1536; }
+QMainWindow, QWidget#CentralRoot, QStackedWidget { background: #FFFFFF; }
+
+QFrame#Sidebar {
+    background: #F8F9FB;
+    border: none;
+    border-right: 1px solid #E2E6EC;
+    min-width: 207px;
+    max-width: 207px;
+}
+QWidget#BrandRow { background: transparent; }
+QLabel#BrandMark { color: #0B1536; font-size: 22px; font-weight: 700; }
+QLabel#BrandSub { color: #65708A; font-size: 11px; letter-spacing: .4px; }
+QLabel#WorkspaceLabel { color: #65708A; font-size: 13px; padding: 5px 16px 7px; }
+QPushButton[class="NavButton"] {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #0B1536;
+    text-align: left;
+    padding: 9px 16px;
+    font-size: 15px;
+    font-weight: 500;
+}
+QPushButton[class="NavButton"]:hover { background: #F0F6F3; color: #08A96E; }
+QPushButton[class="NavButton"]:checked {
+    background: #E4F4EE;
+    border-color: transparent;
+    color: #05A86C;
+    font-weight: 700;
+}
+QPushButton[class="NavButton"]:focus { border: 1px solid #72CEAA; }
+QFrame#ProfileMini {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+}
+QLabel#ProfileMiniAvatar {
+    color: #04AA6D; background: #DDF3E9; border: none; border-radius: 17px;
+    min-width: 34px; max-width: 34px; min-height: 34px; max-height: 34px; font-weight: 700;
+}
+QLabel#ProfileMiniName { color: #0B1536; font-size: 14px; font-weight: 600; }
+QLabel#ProfileMiniMeta { color: #65708A; font-size: 11px; }
+QLabel#ProfileMiniArrow { color: #24314B; font-size: 22px; }
+
+QFrame#WindowTitleBar { background: #FFFFFF; border-bottom: 1px solid #E4E8ED; min-height: 35px; max-height: 35px; }
+QPushButton#WindowMinButton, QPushButton#WindowMaxButton, QPushButton#WindowCloseButton {
+    background: transparent; border: none; color: #0B1536; font-size: 16px; padding: 0;
+}
+QPushButton#WindowMinButton:hover, QPushButton#WindowMaxButton:hover { background: #F0F2F5; }
+QPushButton#WindowCloseButton:hover { background: #E85B5B; color: white; }
+QFrame#TopBar { background: #FFFFFF; border: none; min-height: 104px; max-height: 120px; }
+QLabel#TopDate { color: #0B1536; font-size: 13px; }
+QLabel#TopTitle { color: #0B1536; font-size: 28px; font-weight: 700; }
+QLabel#TopSubtitle { color: #5F6980; font-size: 13px; }
+QPushButton#SwitchUserBtn {
+    background: #FFFFFF; border: 1px solid #DCE2E9; border-radius: 6px;
+    color: #09A96D; padding: 8px 15px; font-size: 13px; font-weight: 600;
+}
+QPushButton#SwitchUserBtn:hover { background: #F0FAF6; border-color: #7FD3B2; }
+
+QPushButton[class="PrimaryButton"], QPushButton#LoginPrimaryAction, QPushButton#RegNextButton {
+    background: #08B875; color: #FFFFFF; border: 1px solid #08B875; border-radius: 6px;
+    padding: 9px 16px; font-size: 14px; font-weight: 700;
+}
+QPushButton[class="PrimaryButton"]:hover, QPushButton#LoginPrimaryAction:hover, QPushButton#RegNextButton:hover { background: #079D65; }
+QPushButton[class="GhostButton"], QPushButton#RegBackButton {
+    background: #FFFFFF; border: 1px solid #D6DDE5; border-radius: 6px;
+    color: #0B1536; padding: 8px 13px; font-size: 13px; font-weight: 600;
+}
+QPushButton[class="GhostButton"]:hover, QPushButton#RegBackButton:hover { background: #F5F8FA; border-color: #88CFAF; }
+QPushButton[class="LinkButton"] { background: transparent; border: none; color: #08A96E; padding: 4px; font-size: 12px; }
+QPushButton[class="LinkButton"]:hover { text-decoration: underline; }
+
+QLineEdit, QComboBox, QSpinBox, QDoubleSpinBox, QTextEdit, QPlainTextEdit {
+    background: #FFFFFF; border: 1px solid #D9DFE8; border-radius: 5px;
+    padding: 8px 11px; color: #0B1536; selection-background-color: #08B875;
+}
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 1px solid #08B875; padding: 8px 11px;
+}
+
+QFrame#MetricStrip {
+    background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px;
+}
+QLabel[class="MetricValue"], QLabel#MetricKcal { color: #05AA6D; font-size: 24px; font-weight: 700; }
+QLabel[class="MetricLabel"] { color: #0B1536; font-size: 12px; }
+QFrame[class="MetricDivider"] { background: #E2E6EB; min-width: 1px; max-width: 1px; }
+QLabel#MealSectionTitle { color: #0B1536; font-size: 15px; font-weight: 700; }
+QFrame#RecipeCard {
+    background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px; min-height: 280px;
+}
+QLabel#MealTag { color: #03A96C; font-size: 14px; font-weight: 700; }
+QLabel#MealTag[meal="午餐"] { color: #E05947; }
+QLabel#MealTag[meal="晚餐"] { color: #2678E8; }
+QLabel#MealRatio, QLabel#DishMeta, QLabel#DishMacro, QLabel#MealNutrientSummary { color: #5F6980; font-size: 10px; }
+QLabel#MealTotalKcal { color: #0B1536; font-size: 11px; }
+QFrame#MealDishRow { background: #FFFFFF; border: 1px solid #E8EBF0; border-radius: 5px; }
+QFrame#MealDishRow:hover { border-color: #A9D8C3; background: #FCFEFD; }
+QLabel#DishName { color: #0B1536; font-size: 12px; font-weight: 600; }
+QLabel#MealEmpty { color: #8A94A6; font-size: 12px; }
+QPushButton#MealDetailButton { padding: 6px 10px; }
+QPushButton#HeartButton { background: transparent; border: none; color: #B2BDCC; font-size: 18px; padding: 2px; }
+QPushButton#HeartButton:checked, QPushButton#HeartButton:hover { color: #08B875; }
+QFrame#DailySummaryBar { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px; }
+QLabel#DailySummaryText { color: #2D3A52; font-size: 11px; }
+QLabel#DailyRuleHint { color: #5F6980; font-size: 11px; padding: 0 3px; }
+
+QFrame#FoodCategoryPanel { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px; padding: 7px; }
+QPushButton[class="CategoryFilter"] { background: transparent; border: 1px solid transparent; border-radius: 5px; color: #26334D; padding: 7px 8px; text-align: center; }
+QPushButton[class="CategoryFilter"]:hover { background: #F2F8F5; }
+QPushButton[class="CategoryFilter"]:checked { background: #E7F6EF; border-color: #8DD7B6; color: #06A86B; font-weight: 600; }
+QLineEdit#FoodSearchInput { min-height: 22px; max-width: 295px; }
+QTableWidget { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px; gridline-color: #EDF0F4; alternate-background-color: #FBFCFD; }
+QHeaderView::section { background: #FFFFFF; color: #26334D; border: none; border-bottom: 1px solid #E0E5EB; padding: 10px 9px; font-weight: 600; }
+QTableWidget::item { padding: 9px 10px; border-bottom: 1px solid #ECEFF3; }
+
+QFrame#AiAssistantPanel, QFrame#RecommendPlanPanel { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 7px; }
+QScrollArea#AiChatScroll { background: #FFFFFF; border: none; }
+QFrame#ChatBubbleUser { background: #E5F4EE; border: 1px solid #D2EAE0; border-radius: 8px; }
+QFrame#ChatBubbleAi { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 8px; }
+QFrame#AiInputBar { background: #FFFFFF; border: none; border-top: 1px solid #E1E6EB; border-radius: 0; }
+QPushButton[class="SuggestChip"] { background: #FFFFFF; color: #08A96E; border: 1px solid #72CDA8; border-radius: 5px; padding: 7px 12px; }
+
+QFrame#ProfileHero, QFrame#ProfileStats, QFrame#ProfileHealthCard, QFrame#FavoritePanel, QFrame#FridgePanelCard {
+    background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 6px;
+}
+QLabel#ProfileAvatar { background: #DFF3E9; border: none; border-radius: 25px; color: #08AA6D; font-size: 22px; min-width: 50px; max-width: 50px; min-height: 50px; max-height: 50px; }
+QLabel#ProfileName { color: #0B1536; font-size: 19px; font-weight: 700; }
+QLabel[class="ProfileStatValue"] { color: #07A96C; font-size: 21px; font-weight: 700; }
+QLabel#FavoritePanelTitle { color: #0B1536; font-size: 16px; font-weight: 700; }
+QLabel#FavoritePanelCount { color: #0B1536; font-size: 13px; }
+QFrame#FavoriteRecipeRow { background: #FFFFFF; border: 1px solid #EDF0F3; border-radius: 5px; }
+QLabel#FavoriteRecipeName { color: #0B1536; font-size: 13px; font-weight: 600; }
+QLabel#FavoriteRecipeMeta { color: #65708A; font-size: 11px; }
+
+QDialog#LoginDialog { background: #F4F5F8; }
+QFrame#LoginShell { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 9px; }
+QWidget#LoginBrandBlock { background: transparent; }
+QLabel#LoginCenterBrand { color: #0B1536; font-size: 22px; font-weight: 700; }
+QLabel#LoginCenterBrandEn { color: #65708A; font-size: 11px; }
+QPushButton[class="LoginTab"] { color: #0B1536; font-size: 14px; padding: 8px 26px; border-bottom: 2px solid transparent; }
+QPushButton[class="LoginTab"]:checked { color: #08B875; border-bottom-color: #08B875; }
+QLabel#LoginFormTitle { color: #0B1536; font-size: 25px; font-weight: 700; }
+QLabel[class="LoginFormCopy"] { color: #5F6980; font-size: 13px; }
+QLabel[class="LoginFieldLabel"] { color: #0B1536; font-size: 13px; font-weight: 600; }
+QLineEdit#LoginInput, QComboBox#LoginCombo, QDoubleSpinBox#LoginNumber { min-height: 28px; }
+QFrame#RegProgressTrack { background: #E6E9EF; border-radius: 2px; min-height: 5px; max-height: 5px; }
+QFrame#RegProgressFill { background: #08B875; border-radius: 2px; min-height: 5px; max-height: 5px; }
+QPushButton[class="TagChip"] { background: #FFFFFF; border: 1px solid #D7DDE6; border-radius: 5px; color: #65708A; padding: 8px 11px; }
+QPushButton[class="TagChip"]:checked { background: #ECF9F4; border-color: #08B875; color: #08A96E; font-weight: 600; }
+QLabel#LoginHint { color: #667085; font-size: 11px; }
+QLabel#LoginHint[error="true"] { color: #D43D3D; }
+
+QDialog#SettingsDialog, QDialog#RecipeDetailDialog { background: #FFFFFF; border: 1px solid #D8DEE7; border-radius: 7px; }
+QLabel#DialogCaption { color: #0B1536; font-size: 13px; font-weight: 700; }
+QPushButton#DialogCloseButton { background: transparent; border: none; color: #0B1536; font-size: 20px; }
+QPushButton#DialogCloseButton:hover { background: #F2F3F5; border-radius: 4px; }
+QLabel#DialogTitle { color: #0B1536; font-size: 18px; font-weight: 700; }
+QFrame#RecipeDetailSection { background: #FFFFFF; border: none; border-top: 1px solid #E4E8ED; }
+QLabel#Disclaimer { color: #6C768B; font-size: 10px; }
+
+QScrollBar:vertical { background: transparent; width: 8px; }
+QScrollBar::handle:vertical { background: #C3CBD4; border-radius: 4px; min-height: 26px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
+QStatusBar { max-height: 0; min-height: 0; border: none; }
+
+/* v2 冰箱库存：工具栏、四项摘要和标准库存表 */
+QLineEdit#FridgeSearchInput { min-width: 230px; max-width: 230px; }
+QWidget#FridgeAddEditor {
+    background: #F8FAFB;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+}
+QFrame#FridgeSummary {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+    min-height: 102px;
+    max-height: 102px;
+}
+QFrame[class="FridgeSummaryCell"] {
+    background: transparent;
+    border: none;
+    border-right: 1px solid #E8ECF0;
+}
+QLabel#FridgeSummaryCaption { color: #536078; font-size: 13px; }
+QLabel#FridgeSummaryValue { color: #08A96E; font-size: 31px; font-weight: 600; }
+QLabel#FridgeSummaryValue[tone="orange"] { color: #F08A1A; }
+QLabel#FridgeSummaryValue[tone="red"] { color: #E43745; }
+QTableWidget#FridgeInventoryTable {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+    gridline-color: #ECEFF3;
+    selection-background-color: #EEF8F4;
+    selection-color: #0B1536;
+}
+QTableWidget#FridgeInventoryTable QHeaderView::section {
+    background: #FFFFFF;
+    color: #435069;
+    border: none;
+    border-bottom: 1px solid #E0E5EB;
+    padding: 11px 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+QTableWidget#FridgeInventoryTable::item {
+    padding: 11px 12px;
+    border-bottom: 1px solid #ECEFF3;
+    font-size: 13px;
+}
+QFrame#FridgeResultPanel {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+}
+
+/* -------------------------------------------------------------------------
+   v2 登录与五步注册：统一品牌源、连续进度线和固定操作区
+   ------------------------------------------------------------------------- */
+QDialog#LoginDialog { background: #F5F6F9; }
+QFrame#LoginShell {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 8px;
+}
+QWidget#LoginBrandBlock, QWidget#LoginTabsHost, QWidget#RegisterRoot,
+QWidget#LoginFormPage, QStackedWidget#LoginFormStack {
+    background: transparent;
+    border: none;
+}
+QWidget#LoginBrandBlock { min-height: 91px; max-height: 91px; }
 QPushButton[class="LoginTab"] {
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
-    color: #98A2B3;
+    border-radius: 0;
+    color: #0B1536;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+QPushButton[class="LoginTab"]:hover { color: #08A96E; background: #FAFCFB; }
+QPushButton[class="LoginTab"]:checked { color: #08B875; border-bottom-color: #08B875; }
+QFrame#LoginRule { background: #E2E6EC; border: none; min-height: 1px; max-height: 1px; }
+QLabel#LoginFormTitle, QLabel#RegisterCenteredTitle {
+    color: #0B1536;
+    font-size: 25px;
+    font-weight: 700;
+}
+QLabel[class="LoginFormCopy"] { color: #5F6980; font-size: 13px; }
+QLabel[class="LoginFieldLabel"] { color: #0B1536; font-size: 13px; font-weight: 600; }
+QLineEdit#LoginInput, QDoubleSpinBox#LoginNumber, QSpinBox#LoginNumber {
+    background: #FFFFFF;
+    border: 1px solid #D9DFE8;
+    border-radius: 5px;
+    padding: 8px 14px;
+    color: #0B1536;
+    font-size: 15px;
+}
+QLineEdit#LoginInput:focus, QDoubleSpinBox#LoginNumber:focus, QSpinBox#LoginNumber:focus {
+    border: 1px solid #08B875;
+    padding: 8px 14px;
+}
+QPushButton#LoginPrimaryAction, QPushButton#RegNextButton {
+    background: #08B875;
+    color: #FFFFFF;
+    border: 1px solid #08B875;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 16px;
+    font-weight: 700;
+}
+QPushButton#LoginPrimaryAction:hover, QPushButton#RegNextButton:hover { background: #079E65; }
+QLabel#LoginLocalMode { color: #526079; font-size: 13px; }
+QLabel#LoginHint { color: #667085; font-size: 11px; }
+QLabel#LoginHint[error="true"] { color: #D43D3D; }
+QFrame#RegProgressTrack { background: #E6E9EF; border: none; border-radius: 3px; }
+QFrame#RegProgressFill { background: #08B875; border: none; border-radius: 3px; }
+QPushButton#RegBackButton {
+    background: #FFFFFF;
+    color: #0B1536;
+    border: 1px solid #D2D9E3;
+    border-radius: 6px;
     font-size: 16px;
     font-weight: 600;
-    padding: 4px 0 11px;
-    min-width: 46px;
 }
-QPushButton[class="LoginTab"]:checked {
-    color: #0f766e;
-    border-bottom-color: #00C4B3;
-}
-QFrame#LoginRule { background: #E4E7EC; max-height: 1px; min-height: 1px; border: none; }
-QLabel#LoginFormTitle {
-    color: #101828;
-    font-family: "Georgia", "SimSun", serif;
-    font-size: 24px;
-    font-weight: 700;
-}
-QLabel[class="LoginFormCopy"], QLabel[class="LoginTip"] { color: #667085; font-size: 11px; }
-QLabel[class="LoginFieldLabel"] { color: #344054; font-size: 12px; font-weight: 700; }
-QLabel[class="LoginUnitLabel"] { color: #667085; font-size: 12px; font-weight: 600; min-width: 24px; }
-QLineEdit#LoginInput, QComboBox#LoginCombo, QDoubleSpinBox#LoginNumber {
-    background: #F8FAFD;
-    border: 1px solid #D0D5DD;
-    border-radius: 10px;
-    min-height: 28px;
-    padding: 6px 8px;
-    color: #1D2939;
-}
-QDoubleSpinBox#LoginNumber {
-    padding-right: 10px;
-}
-QLineEdit#LoginInput:focus, QComboBox#LoginCombo:focus, QDoubleSpinBox#LoginNumber:focus {
-    background: #FFFFFF;
-    border: 2px solid #00C4B3;
-    padding: 7px 10px;
-}
-QPushButton#LoginPrimaryAction {
-    background: #00C4B3;
+QPushButton#RegBackButton:hover { background: #F5F8FA; border-color: #7ACDAA; }
+QPushButton#RegBackLink {
+    background: transparent;
+    color: #08A96E;
     border: none;
-    border-radius: 12px;
-    color: #FFFFFF;
+    padding: 3px 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+QPushButton#RegBackLink:hover { text-decoration: underline; }
+QRadioButton { color: #0B1536; font-size: 14px; spacing: 9px; }
+QRadioButton::indicator {
+    width: 17px; height: 17px; border: 1px solid #C8D0DC; border-radius: 9px; background: #FFFFFF;
+}
+QRadioButton::indicator:checked { background: #08B875; border: 4px solid #FFFFFF; }
+QLabel#RegisterChangeTip { color: #6B768D; font-size: 12px; padding: 5px 0; }
+QFrame#RegisterOptionPanel {
+    background: #FFFFFF;
+    border: 1px solid #DCE2E9;
+    border-radius: 7px;
+}
+QFrame#RegisterOptionPanel[tone="orange"] { background: #FFFBF8; border-color: #F3DCC7; }
+QFrame#RegisterOptionPanel[tone="blue"] { background: #FAFCFF; border-color: #D9E3F6; }
+QLabel#RegisterPanelTitle { color: #0B1536; font-size: 16px; font-weight: 700; }
+QWidget#PreferenceChoiceGroup QPushButton[class="TagChip"] {
+    min-width: 125px;
+    min-height: 47px;
+    background: #FFFFFF;
+    border: 1px solid #D7DDE6;
+    border-radius: 5px;
+    color: #65708A;
+    padding: 0 13px;
+    text-align: left;
+    font-size: 14px;
+}
+QWidget#PreferenceChoiceGroup QPushButton[class="TagChip"]:checked {
+    background: #ECF9F4;
+    border-color: #08B875;
+    color: #08A96E;
+    font-weight: 600;
+}
+QWidget#RegisterInlineTags QLabel#TagGroupTitle,
+QWidget#PreferenceChoiceGroup QLabel#TagGroupTitle {
+    color: #0B1536;
     font-size: 14px;
     font-weight: 700;
-    min-height: 28px;
-    padding: 10px 14px;
 }
-QPushButton#LoginPrimaryAction:hover { background: #0d9488; }
-QLabel#LoginStepLabel {
-    color: #0f766e;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-}
-QLabel#LoginHint[error="true"] { color: #B42318; }
-QSlider#ProfileSlider::groove:horizontal { background: #E4E7EC; border-radius: 3px; height: 5px; }
-QSlider#ProfileSlider::sub-page:horizontal { background: #00C4B3; border-radius: 3px; }
-QSlider#ProfileSlider::handle:horizontal {
+QWidget#RegisterInlineTags QPushButton[class="TagChip"] {
+    min-height: 34px;
     background: #FFFFFF;
-    border: 2px solid #00C4B3;
-    border-radius: 8px;
-    height: 12px;
-    margin: -5px 0;
-    width: 12px;
+    border: 1px solid #D7DDE6;
+    border-radius: 5px;
+    color: #41506A;
+    padding: 6px 12px;
+    font-size: 13px;
 }
+QWidget#RegisterInlineTags QPushButton[class="TagChip"]:checked {
+    background: #ECF9F4;
+    border-color: #08B875;
+    color: #08A96E;
+}
+QPushButton[class="RegisterAddButton"] {
+    background: #FFFFFF;
+    border: 1px dashed #08B875;
+    border-radius: 5px;
+    color: #08A96E;
+    padding: 7px 12px;
+    font-size: 13px;
+}
+QPushButton[class="RegisterAddButton"]:hover { background: #F0FBF7; }
 
-QStackedWidget { background: #F8FAFD; }
-QFrame#RecipeCard { border-radius: 16px; min-height: 220px; }
+/* v2 智能推荐问答 */
+QFrame#AiAssistantPanel { min-width: 0; }
+QFrame#AiAssistantPanel QLabel[class="SectionTitle"] {
+    color: #0B1536;
+    font-size: 17px;
+    font-weight: 700;
+}
+QFrame#AiAssistantPanel QLabel[class="HintText"] { color: #6A748A; }
+QScrollArea#AiChatScroll { border: none; background: #FFFFFF; }
+QFrame#ChatBubbleUser {
+    min-width: 480px;
+    max-width: 570px;
+    background: #E5F4EE;
+    border: 1px solid #D2EAE0;
+    border-radius: 8px;
+}
+QFrame#ChatBubbleAi {
+    min-width: 390px;
+    max-width: 500px;
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 8px;
+}
+QLabel#ChatBubbleWho { color: #5B6880; font-size: 11px; font-weight: 600; }
+QLabel#ChatBubbleText { color: #14203D; font-size: 13px; line-height: 1.5; }
+QLineEdit#AiChatInput { min-height: 27px; }
 
-/* 智能推荐：三餐区 + AI 助手 */
-QFrame#RecommendPlanPanel { background: #FFFFFF; }
-QLabel#RecommendSummary {
-    background: #F8FAFD;
-    border: 1px solid #E4E7EC;
-    border-radius: 10px;
-    padding: 10px 12px;
-    color: #475467;
+/* v2 个人档案 */
+QFrame#ProfileOverviewCard, QFrame#ProfileHealthCard, QFrame#ProfileFavoriteCard {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 6px;
+}
+QWidget#ProfileStatsRow {
+    background: #FFFFFF;
+    border: none;
+    border-top: 1px solid #E7EBEF;
+}
+QWidget[class="ProfileValueBlock"], QWidget[class="HealthValueBlock"] {
+    background: transparent;
+    border: none;
+    border-right: 1px solid #E8ECF0;
+}
+QLabel#ProfileGoalChip {
+    background: #DFF3E9;
+    color: #08A96E;
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 11px;
+}
+QLabel#ProfileValueCaption, QLabel#HealthValueCaption {
+    color: #536078;
     font-size: 12px;
 }
-QLabel#RecommendReasons {
-    background: #F0FDFA;
-    border: 1px solid #99F6E4;
-    border-radius: 10px;
-    padding: 10px 12px;
-    color: #0f766e;
+QLabel#ProfileValueText {
+    color: #08A96E;
+    font-size: 20px;
+    font-weight: 600;
+}
+QLabel#HealthValueText {
+    color: #08A96E;
+    font-size: 15px;
+    font-weight: 600;
+}
+QLabel#ProfileFavoriteSummary {
+    color: #14203D;
+    font-size: 14px;
+    line-height: 1.5;
+}
+QFrame#SettingsHealthCard {
+    background: #FFFFFF;
+    border: 1px solid #E0E5EB;
+    border-radius: 5px;
+}
+QWidget[class="SettingsHealthRow"] {
+    background: transparent;
+    border: none;
+    border-top: 1px solid #EDF0F3;
+}
+QLabel#SettingsHealthCaption { color: #536078; font-size: 12px; }
+QLabel#SettingsHealthValue { color: #0B1536; font-size: 12px; }
+QDialog#SettingsDialog QLineEdit,
+QDialog#SettingsDialog QComboBox,
+QDialog#SettingsDialog QDoubleSpinBox,
+QDialog#SettingsDialog QPlainTextEdit {
+    min-height: 18px;
+    padding: 3px 8px;
+}
+QDialog#SettingsDialog QLineEdit[readOnly="true"] {
+    background: #F8FAF9;
+    color: #202522;
+}
+
+/* 固定单位：与数值输入分离，单位标签不参与编辑。 */
+QLabel#LoginUnitLabel {
+    min-height: 28px;
+    background: #F5F7F6;
+    border: 1px solid #D6DDE5;
+    border-radius: 5px;
+    color: #35403A;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* 清冰箱推荐结果：图片、菜名和营养摘要组成可点击行。 */
+QListWidget#FridgeResultList::item {
+    padding: 0;
+    margin: 0 0 4px 0;
+    border: 1px solid #E2E7E4;
+    border-radius: 6px;
+}
+QListWidget#FridgeResultList::item:selected {
+    background: #E7EFEA;
+    border: 1px solid #8FB7A6;
+}
+QFrame#FridgeRecipeResult { background: transparent; border: none; }
+QLabel#FridgeRecipeImage { background: #EEF3F0; border: none; border-radius: 6px; }
+QLabel#FridgeRecipeName { color: #202522; font-size: 15px; font-weight: 600; }
+QLabel#FridgeRecipeMeta { color: #68716C; font-size: 12px; }
+QLabel#FridgeRecipeOpen { color: #28594A; font-size: 12px; font-weight: 600; }
+
+/* -------------------------------------------------------------------------
+   v2 第二轮像素校准：今日方案、食材表、问答与紧凑弹窗
+   ------------------------------------------------------------------------- */
+QFrame#RecipeCard { min-height: 318px; }
+QFrame#RecipeCard:hover { border-color: #85CEAE; background: #FCFEFD; }
+QFrame#MealDishRow { min-height: 62px; max-height: 66px; }
+QLabel#RecipeThumb { border-radius: 5px; background: #F2F5F3; }
+QLabel#DailyRuleHint { padding-left: 4px; }
+
+QFrame#FoodCategoryPanel { padding: 0; }
+QPushButton[class="CategoryFilter"] {
+    min-width: 0;
+    padding: 6px 5px;
     font-size: 12px;
     font-weight: 500;
 }
-QFrame#AiAssistantPanel {
+QLineEdit#FoodSearchInput { min-width: 316px; max-width: 316px; min-height: 22px; }
+
+QLabel#ChatBubbleTime { color: #6D7890; font-size: 10px; }
+QLabel#AiScopeNote { color: #69758C; font-size: 11px; padding: 4px 2px 0 2px; }
+QPushButton[class="SuggestChip"] { min-height: 22px; }
+
+QDialog#SettingsDialog { min-width: 418px; max-width: 418px; min-height: 487px; max-height: 487px; }
+QDialog#SettingsDialog QLabel#DialogTitle { font-size: 14px; }
+QDialog#SettingsDialog QLineEdit,
+QDialog#SettingsDialog QComboBox,
+QDialog#SettingsDialog QDoubleSpinBox { min-height: 20px; max-height: 28px; }
+QDialog#SettingsDialog QPushButton[class="PrimaryButton"] { min-width: 90px; padding: 6px 10px; }
+QDialog#SettingsDialog QPushButton[class="GhostButton"] { min-width: 56px; padding: 6px 10px; }
+QDialog#HealthTagEditor { background: #FFFFFF; }
+
+QDialog#RecipeDetailDialog { min-width: 386px; max-width: 386px; min-height: 464px; max-height: 464px; }
+QLabel#RecipeDetailHeroImage { background: #EEF3F0; border: none; border-radius: 7px; }
+QLabel#RecipeDetailTitle { color: #0B1536; font-size: 16px; font-weight: 700; }
+QLabel#RecipeDetailDescription { color: #5E6980; font-size: 11px; }
+QFrame#RecipeNutritionStrip { background: #FFFFFF; border: 1px solid #E0E5EB; border-radius: 5px; }
+QLabel#RecipeKcalValue { color: #08A96E; font-size: 18px; font-weight: 700; }
+QLabel#RecipeMacroValue { color: #0B1536; font-size: 12px; font-weight: 600; }
+QLabel#RecipeMacroLabel { color: #69748A; font-size: 10px; }
+QLabel#RecipeColumnTitle { color: #0B1536; font-size: 13px; font-weight: 700; }
+QLabel#RecipeIngredientLine, QLabel#RecipeStepsText { color: #35415A; font-size: 10px; }
+QTabWidget#RecipeDishTabs::pane { border: none; border-top: 1px solid #E5E9EE; }
+QTabWidget#RecipeDishTabs QTabBar::tab {
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    color: #667188; padding: 5px 8px; font-size: 10px;
+}
+QTabWidget#RecipeDishTabs QTabBar::tab:selected { color: #08A96E; border-bottom-color: #08A96E; }
+QPushButton#RecipeFavoriteButton { color: #08A96E; border-color: #70CDA8; }
+QPushButton#RecipeCloseButton { min-width: 66px; }
+QPushButton[class="FavoriteNameButton"] {
+    background: transparent; border: none; color: #0B1536; padding: 0;
+    text-align: left; font-size: 13px; font-weight: 600;
+}
+QPushButton[class="FavoriteNameButton"]:hover { color: #08A96E; }
+QFrame#FavoriteFoodRow { background: #FFFFFF; border: none; border-bottom: 1px solid #E9EDF1; }
+QLabel#FavoriteFoodMark {
+    background: #E4F4EE; color: #08A96E; border-radius: 22px;
+    min-width: 44px; max-width: 44px; min-height: 44px; max-height: 44px; font-weight: 700;
+}
+QPushButton[class="FavoriteViewAll"] {
+    min-height: 34px; background: transparent; border: none; border-top: 1px solid #E8ECF0;
+    color: #0B1536; font-size: 12px; font-weight: 600;
+}
+QPushButton[class="FavoriteViewAll"]:hover { color: #08A96E; background: #FAFCFB; }
+
+/* -------------------------------------------------------------------------
+   版面设计 v5 最终覆盖层（1024×768 逻辑像素）
+   ------------------------------------------------------------------------- */
+* {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 14px;
+}
+QDialog#LoginDialog { background: #F5F6F9; }
+QFrame#LoginShell {
+    min-width: 498px; max-width: 498px;
+    min-height: 645px; max-height: 645px;
+    background: #FFFFFF; border: 1px solid #DFE4EA; border-radius: 8px;
+}
+QLabel#TopTitle, QLabel#FoodPageTitle {
+    color: #0B1536; font-size: 28px; font-weight: 700;
+}
+
+QWidget#DashboardOverview { background: transparent; border: none; }
+QFrame#CalorieOverviewCard, QFrame#DashboardStatusCard {
+    background: #FFFFFF; border: 1px solid #DCE2E9; border-radius: 7px;
+}
+QFrame#DashboardStatusCard[tone="green"] { background: #FCFEFD; }
+QFrame#DashboardStatusCard[tone="blue"] { background: #FCFDFF; }
+QLabel#MetricKcal { color: #07AD6D; font-size: 27px; font-weight: 500; }
+QLabel#RingUnit { color: #0B1536; font-size: 12px; }
+QLabel#OverviewCaption { color: #0B1536; font-size: 15px; font-weight: 700; }
+QLabel#OverviewSubCaption, QLabel#DashboardStatusCaption { color: #24314B; font-size: 12px; }
+QLabel#CompletionValue { color: #08AF6E; font-size: 26px; font-weight: 500; }
+QLabel#DashboardStatusIcon {
+    min-width: 44px; max-width: 44px; min-height: 44px; max-height: 44px;
+    border-radius: 22px; font-size: 28px; font-weight: 500;
+}
+QLabel#DashboardStatusIcon[tone="green"] { color: #0AB170; background: #E8F7F0; }
+QLabel#DashboardStatusIcon[tone="blue"] { color: #4D78F0; background: #EEF2FF; }
+QLabel#DashboardStatusValue { font-size: 20px; font-weight: 600; }
+QLabel#DashboardStatusValue[tone="green"] { color: #08AD6D; }
+QLabel#DashboardStatusValue[tone="blue"] { color: #4D78F0; }
+
+QFrame#RecipeCard { border-radius: 7px; min-height: 278px; max-height: 278px; }
+QFrame#RecipeCard[meal="早餐"] { background: #FFFCF8; border-color: #FFD39F; }
+QFrame#RecipeCard[meal="午餐"] { background: #FBFEFC; border-color: #BDE7D6; }
+QFrame#RecipeCard[meal="晚餐"] { background: #FBFCFF; border-color: #C9D7FF; }
+QLabel#MealIcon { background: transparent; border: none; }
+QLabel#MealIcon[tone="orange"] { background: #F59E0B; border-radius: 20px; }
+QLabel#MealIcon[tone="green"] { background: #059669; border-radius: 20px; }
+QLabel#MealIcon[tone="blue"] { background: #0891B2; border-radius: 20px; }
+QLabel#MealTag { font-size: 15px; }
+QLabel#MealRatio { font-size: 11px; }
+QLabel#MealTotalKcal { font-size: 19px; font-weight: 500; padding-top: 5px; }
+QFrame#RecipeCard[meal="早餐"] QLabel#MealTotalKcal { color: #FF8A00; }
+QFrame#RecipeCard[meal="午餐"] QLabel#MealTotalKcal { color: #07AE68; }
+QFrame#RecipeCard[meal="晚餐"] QLabel#MealTotalKcal { color: #4D78F0; }
+QFrame#MealDishRow { min-height: 60px; max-height: 62px; border: none; background: #FFFFFF; }
+QFrame#MealDishRow[compact="true"] { min-height: 71px; max-height: 78px; }
+QFrame#MealDishRow:hover { background: #F6FBF8; border: 1px solid #8CCFB2; }
+QLabel#DishName { font-size: 12px; font-weight: 600; }
+QLabel#DishMeta, QLabel#DishMacro { font-size: 9px; }
+QFrame#DailySummaryBar { min-height: 80px; max-height: 80px; }
+QPushButton#DashboardRegenButton { min-width: 142px; min-height: 38px; }
+
+QToolButton#FoodFavoriteStar {
+    background: transparent; border: none; color: #8090AC;
+    font-size: 24px; padding: 2px;
+}
+QToolButton#FoodFavoriteStar:hover { color: #08AE6D; background: #EDF9F4; border-radius: 5px; }
+QToolButton#FoodFavoriteStar:checked { color: #08AE6D; }
+QFrame#FoodSummaryCard { border: 1px solid #DDE4E9; border-radius: 8px; }
+QFrame#FoodSummaryCard[tone="green"] { background: #FAFDFC; border-color: #D3EAE0; }
+QFrame#FoodSummaryCard[tone="orange"] { background: #FFFCF8; border-color: #F4DFC5; }
+QFrame#FoodSummaryCard[tone="purple"] { background: #FCFBFF; border-color: #E1DCF5; }
+QLabel#FoodSummaryIcon {
+    min-width: 52px; max-width: 52px; min-height: 52px; max-height: 52px;
+    border-radius: 26px; font-size: 28px;
+}
+QLabel#FoodSummaryIcon[tone="green"] { color: #08AD6D; background: #E4F5EE; }
+QLabel#FoodSummaryIcon[tone="orange"] { color: #FF8917; background: #FFF0DD; }
+QLabel#FoodSummaryIcon[tone="purple"] { color: #705BDC; background: #F0ECFF; }
+QLabel#FoodSummaryCaption { color: #3C4961; font-size: 13px; }
+QLabel#FoodSummaryValue { font-size: 28px; font-weight: 500; }
+QLabel#FoodSummaryValue[tone="green"] { color: #08AD6D; }
+QLabel#FoodSummaryValue[tone="orange"] { color: #F28A19; }
+QLabel#FoodSummaryValue[tone="purple"] { color: #705BDC; }
+QFrame#FoodCategoryPanel { min-height: 115px; max-height: 115px; }
+QPushButton[class="CategoryFilter"] { min-height: 34px; max-height: 34px; }
+QLineEdit#FoodSearchInput { min-height: 38px; max-height: 38px; }
+
+QFrame#FridgeSummary { background: transparent; border: none; }
+QFrame[class="FridgeSummaryCell"] {
+    border: 1px solid #DDE4E9; border-radius: 8px; margin-right: 8px;
+}
+QFrame[class="FridgeSummaryCell"][tone="green"] { background: #F8FDFC; border-color: #D3EAE0; }
+QFrame[class="FridgeSummaryCell"][tone="blue"] { background: #F8FBFF; border-color: #D8E5F7; }
+QFrame[class="FridgeSummaryCell"][tone="orange"] { background: #FFFBF6; border-color: #F6DFC2; }
+QFrame[class="FridgeSummaryCell"][tone="red"] { background: #FFF9F9; border-color: #F5D5D8; }
+QLabel#FridgeSummaryValue[tone="blue"] { color: #267DE8; }
+QLabel#FridgeSummaryIcon {
+    min-width: 46px; max-width: 46px; min-height: 46px; max-height: 46px;
+    border-radius: 23px; font-size: 21px; font-weight: 700;
+}
+QLabel#FridgeSummaryIcon[tone="green"] { color: #08A96E; background: #E4F5ED; }
+QLabel#FridgeSummaryIcon[tone="blue"] { color: #287FE8; background: #E7F1FF; }
+QLabel#FridgeSummaryIcon[tone="orange"] { color: #F28A19; background: #FFF0DE; }
+QLabel#FridgeSummaryIcon[tone="red"] { color: #D94045; background: #FFE8E9; }
+
+QFrame#TodayAdvicePanel {
+    background: #FBFDFC; border: 1px solid #DDE5E1; border-radius: 8px;
+}
+QLabel#TodayAdviceTitle { color: #08A96E; font-size: 17px; font-weight: 700; }
+QFrame#AdviceCard { background: #FFFFFF; border: 1px solid #E3E8EC; border-radius: 8px; }
+QLabel#AdviceIcon {
+    min-width: 38px; max-width: 38px; min-height: 38px; max-height: 38px;
+    border-radius: 19px; font-size: 20px;
+}
+QLabel#AdviceIcon[tone="green"] { color: #08AA6D; background: #E7F7EF; }
+QLabel#AdviceIcon[tone="orange"] { color: #F58A19; background: #FFF0DF; }
+QLabel#AdviceCaption { color: #17213B; font-size: 13px; font-weight: 700; }
+QLabel#AdviceBody { color: #65708A; font-size: 11px; }
+QFrame#AdviceRecordCard {
+    background: #EAF8F1; border: 1px solid #D5EFE3; border-radius: 7px;
+}
+QLabel#AdviceRecordHint {
+    color: #08A96E; background: transparent; border: none; padding: 0; font-size: 11px;
+}
+
+QDialog#RecipeDetailDialog {
+    min-width: 405px; max-width: 405px;
+    min-height: 490px; max-height: 490px;
+}
+QDialog#SettingsDialog QLineEdit, QDialog#SettingsDialog QComboBox,
+QDialog#SettingsDialog QDoubleSpinBox { min-height: 26px; max-height: 26px; }
+QPushButton#RecipeFavoriteButton:checked {
+    color: #079D65; background: #EDF9F4; border-color: #4FC08E;
+}
+
+/* v5 档案页：真实数据卡片，保持三段内容在 768px 内完整可见。 */
+QFrame#ProfileOverviewCard, QFrame#ProfileHealthCard, QFrame#ProfileFavoriteCard {
+    background: #FFFFFF; border: 1px solid #DDE3E8; border-radius: 8px;
+}
+QFrame[class="ProfileValueBlock"], QFrame[class="HealthValueBlock"],
+QFrame[class="ProfileFavoriteBlock"] { border: 1px solid #DDE5E1; border-radius: 8px; }
+QFrame[class="ProfileValueBlock"][tone="green"], QFrame[class="HealthValueBlock"][tone="green"] {
+    background: #F9FDFC; border-color: #D5EADF;
+}
+QFrame[class="ProfileValueBlock"][tone="blue"], QFrame[class="HealthValueBlock"][tone="blue"] {
+    background: #FAFCFF; border-color: #D8E5F5;
+}
+QFrame[class="ProfileValueBlock"][tone="orange"], QFrame[class="HealthValueBlock"][tone="orange"],
+QFrame[class="ProfileFavoriteBlock"][tone="orange"] {
+    background: #FFFBF7; border-color: #F4DEC3;
+}
+QFrame[class="ProfileValueBlock"][tone="purple"], QFrame[class="HealthValueBlock"][tone="purple"] {
+    background: #FCFBFF; border-color: #E4DDF4;
+}
+QFrame[class="ProfileFavoriteBlock"][tone="green"] {
+    background: #F9FDFC; border-color: #D5EADF;
+}
+QLabel#ProfileValueIcon, QLabel#HealthValueIcon, QLabel#ProfileFavoriteIcon {
+    min-width: 40px; max-width: 40px; min-height: 40px; max-height: 40px;
+    border-radius: 20px; font-size: 16px; font-weight: 600;
+}
+QLabel#ProfileValueIcon[tone="green"], QLabel#HealthValueIcon[tone="green"],
+QLabel#ProfileFavoriteIcon[tone="green"] { color: #08A96E; background: #E7F6EF; }
+QLabel#ProfileValueIcon[tone="blue"], QLabel#HealthValueIcon[tone="blue"] {
+    color: #4D78F0; background: #EAF1FF;
+}
+QLabel#ProfileValueIcon[tone="orange"], QLabel#HealthValueIcon[tone="orange"],
+QLabel#ProfileFavoriteIcon[tone="orange"] { color: #F47D18; background: #FFF0E0; }
+QLabel#ProfileValueIcon[tone="purple"], QLabel#HealthValueIcon[tone="purple"] {
+    color: #765BDA; background: #F0ECFF;
+}
+QLabel#ProfileValueCaption, QLabel#HealthValueCaption { color: #37435A; font-size: 12px; }
+QLabel#ProfileValueText, QLabel#HealthValueText { color: #08A96E; font-size: 17px; font-weight: 700; }
+QLabel#ProfileFavoriteValue { font-size: 21px; font-weight: 700; }
+QLabel#ProfileFavoriteValue[tone="orange"] { color: #F47D18; }
+QLabel#ProfileFavoriteValue[tone="green"] { color: #08A96E; }
+QFrame#FavoritePanel { background: #FFFFFF; border: 1px solid #DDE4E9; border-radius: 8px; }
+QFrame[class="FavoritePanelHeader"] { min-height: 38px; max-height: 38px; border-radius: 6px; }
+QFrame[class="FavoritePanelHeader"][tone="orange"] { background: #FFF4E8; border: none; }
+QFrame[class="FavoritePanelHeader"][tone="blue"] { background: #EEF1FF; border: none; }
+QFrame#FavoritePanel[tone="orange"] QLabel#FavoritePanelTitle { color: #9B431D; }
+QFrame#FavoritePanel[tone="blue"] QLabel#FavoritePanelTitle { color: #243B79; }
+
+/* v5 修正包最终覆盖：字体、SVG 容器、独立营养分栏和紧凑设置弹窗。 */
+QLabel#TopTitle, QLabel#FoodPageTitle, QLabel#LoginFormTitle,
+QLabel#RegisterCenteredTitle, QLabel#DialogCaption,
+QDialog#SettingsDialog QLabel#DialogTitle,
+QDialog#HealthTagEditor QLabel#DialogTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-weight: 400;
+    letter-spacing: 0px;
+}
+QLabel#TopTitle, QLabel#FoodPageTitle { font-size: 31px; min-height: 42px; }
+QLabel#LoginFormTitle, QLabel#RegisterCenteredTitle { font-size: 27px; }
+QLabel#DialogCaption, QDialog#HealthTagEditor QLabel#DialogTitle { font-size: 21px; }
+QDialog#SettingsDialog QLabel#DialogTitle { font-size: 28px; }
+
+QFrame#ProviderStatusDot {
+    background: #18A866; border: none; border-radius: 4px;
+}
+
+QWidget[class="DailySummaryMetric"] {
+    background: transparent; border: none; border-right: 1px solid #E3E8EC;
+}
+QLabel#DailySummaryCaption { color: #69758A; font-size: 11px; }
+QLabel#DailySummaryValue { color: #15213B; font-size: 15px; font-weight: 600; }
+QLabel#DailySummaryValue[tone="green"] { color: #08A96E; }
+QLabel#DailySummaryValue[tone="blue"] { color: #3975DB; }
+QLabel#DailySummaryValue[tone="orange"] { color: #E47A18; }
+
+QFrame[class="RecipeNutritionMetric"] {
+    border: none; border-radius: 5px; padding: 3px;
+}
+QFrame[class="RecipeNutritionMetric"][tone="kcal"] { background: #EAF8F1; }
+QFrame[class="RecipeNutritionMetric"][tone="protein"] { background: #EDF4FF; }
+QFrame[class="RecipeNutritionMetric"][tone="carbs"] { background: #FFF3E5; }
+QFrame[class="RecipeNutritionMetric"][tone="fat"] { background: #F2EEFF; }
+
+QDialog#SettingsDialog {
+    min-width: 420px; max-width: 420px; min-height: 508px; max-height: 508px;
+}
+QLabel#SettingsSectionTitle { color: #18233D; font-size: 14px; font-weight: 700; }
+QWidget#SettingsFieldBlock { background: transparent; border: none; }
+QLabel#SettingsFieldLabel { color: #59657A; font-size: 11px; }
+QFrame[class="SettingsHealthTile"] {
+    min-height: 58px; max-height: 58px; border: 1px solid #DDE4E9; border-radius: 7px;
+}
+QFrame[class="SettingsHealthTile"][tone="green"] { background: #F7FCFA; border-color: #D2EADF; }
+QFrame[class="SettingsHealthTile"][tone="blue"] { background: #F8FBFF; border-color: #D9E5F5; }
+QFrame[class="SettingsHealthTile"][tone="orange"] { background: #FFFBF6; border-color: #F3DFC7; }
+QFrame[class="SettingsHealthTile"][tone="purple"] { background: #FBF9FF; border-color: #E3DCF4; }
+QLabel#SettingsHealthCaption { color: #26334B; font-size: 11px; font-weight: 600; }
+QLabel#SettingsHealthValue { color: #68738A; font-size: 10px; }
+QPushButton[class="SettingsHealthEdit"] {
+    min-width: 25px; max-width: 25px; min-height: 25px; max-height: 25px;
+    background: transparent; border: none; padding: 2px;
+}
+QPushButton[class="SettingsHealthEdit"]:hover { background: #EAF4EF; border-radius: 4px; }
+
+QPushButton#RecommendGoalTag {
+    min-height: 32px; max-height: 32px; padding: 0 10px;
+    border-radius: 6px; font-size: 12px; font-weight: 600;
+}
+QPushButton#RecommendGoalTag[tone="green"] { color: #079A61; background: #EDF8F2; border: 1px solid #CFE9DD; }
+QPushButton#RecommendGoalTag[tone="blue"] { color: #2E6FD7; background: #F0F6FF; border: 1px solid #CFE0F7; }
+QPushButton#RecommendGoalTag[tone="orange"] { color: #DF7615; background: #FFF7ED; border: 1px solid #F2D9BB; }
+QFrame#ChatBubbleUser { min-width: 440px; max-width: 440px; }
+QFrame#ChatBubbleAi { min-width: 410px; max-width: 410px; }
+QWidget#AiScopeNote { background: transparent; border: none; }
+QLabel#AiScopeNoteText { color: #69758C; font-size: 11px; }
+QFrame#TopBar { min-height: 119px; max-height: 119px; }
+QPushButton[class="CategoryFilter"] { padding: 0 5px; min-height: 34px; max-height: 34px; }
+
+/* 2026-08-30 交互修正：固定单位、动态标签等高、收藏搜索。 */
+QLabel#FixedUnitLabel {
+    background: transparent; border: none; color: #667188;
+    font-size: 14px; padding: 0;
+}
+QDoubleSpinBox[fixedUnit="true"], QSpinBox[fixedUnit="true"],
+QDoubleSpinBox#LoginNumber[fixedUnit="true"], QSpinBox#LoginNumber[fixedUnit="true"] {
+    padding-right: 48px;
+}
+QDoubleSpinBox#LoginNumber[fixedUnit="true"]:focus,
+QSpinBox#LoginNumber[fixedUnit="true"]:focus { padding-right: 48px; }
+QWidget#RegisterHealthTags QPushButton[class="TagChip"] {
+    min-height: 47px; max-height: 47px; min-width: 0;
+    padding: 0 12px;
+}
+
+/* AI 生成成功后的明确次级操作：不自动打断对话，支持键盘焦点与点击跳转。 */
+QFrame#ChatPlanReady {
+    background: #F3FAF6;
+    border: 1px solid #BFE2D1;
+    border-radius: 8px;
+    min-width: 0;
+    max-width: 400px;
+}
+QPushButton#ChatPlanLink {
+    min-height: 34px;
+    padding: 5px 10px;
     background: #FFFFFF;
+    color: #087A53;
+    border: 1px solid #84C9AA;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
 }
-QScrollArea#AiChatScroll {
-    background: #F8FAFD;
-    border: 1px solid #E4E7EC;
-    border-radius: 12px;
+QPushButton#ChatPlanLink:hover { background: #E7F5EE; border-color: #08A96E; }
+QPushButton#ChatPlanLink:pressed { background: #D8EEE4; }
+QPushButton#ChatPlanLink:focus { border: 2px solid #087A53; padding: 4px 9px; }
+QLineEdit#FavoriteSearchInput {
+    min-height: 36px; max-height: 36px; background: #FFFFFF;
+    border: 1px solid #D9E1E7; border-radius: 6px;
+    padding: 0 10px; color: #26334B;
 }
-QWidget#AiChatHost { background: transparent; }
-QFrame#ChatBubbleAi {
+QLineEdit#FavoriteSearchInput:focus { border-color: #08A96E; }
+QLabel#MealTotalKcal[tone="orange"] { color: #F28A16; }
+QLabel#MealTotalKcal[tone="green"] { color: #08A96E; }
+QLabel#MealTotalKcal[tone="blue"] { color: #4D78F0; }
+
+/* -------------------------------------------------------------------------
+   V6 最终字体规范（必须保留在文件末尾，作为唯一权威覆盖层）
+   正文/导航/数据：Noto Sans SC；页面与分区标题：华文楷体。
+   ------------------------------------------------------------------------- */
+* {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 14px;
+}
+
+QLabel#TopTitle,
+QLabel#FoodPageTitle,
+QLabel#LoginFormTitle,
+QLabel#RegisterCenteredTitle,
+QLabel#DialogCaption,
+QLabel[class="SectionTitle"],
+QLabel#MealSectionTitle,
+QDialog#SettingsDialog QLabel#DialogTitle,
+QDialog#HealthTagEditor QLabel#DialogTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    color: #0B1536;
+    font-weight: 400;
+    letter-spacing: 0px;
+}
+
+QLabel#TopTitle,
+QLabel#FoodPageTitle {
+    font-size: 31px;
+    min-height: 42px;
+}
+QLabel#LoginFormTitle,
+QLabel#RegisterCenteredTitle { font-size: 27px; }
+QLabel#DialogCaption,
+QLabel[class="SectionTitle"],
+QLabel#MealSectionTitle,
+QDialog#HealthTagEditor QLabel#DialogTitle { font-size: 21px; }
+QDialog#SettingsDialog QLabel#DialogTitle { font-size: 28px; }
+
+QLabel#TopDate { color: #14213D; font-size: 13px; }
+QLabel#TopSubtitle { color: #475569; font-size: 13px; }
+QPushButton[class="NavButton"] { color: #14213D; font-size: 15px; }
+QLabel[class="CardTitle"] { color: #14213D; font-size: 16px; font-weight: 600; }
+QLabel#ProfileValueCaption,
+QLabel#HealthValueCaption { color: #37435A; font-size: 12px; }
+QLabel#ProfileValueText,
+QLabel#HealthValueText { font-size: 17px; font-weight: 700; }
+
+/* V6 登录与五步注册：878×678 共用双栏外框。 */
+QDialog#LoginDialog { background: #F7F4EE; }
+QFrame#LoginShell {
+    min-width: 878px; max-width: 878px;
+    min-height: 670px; max-height: 670px;
+    background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 14px;
+}
+QStackedWidget#LoginRailStack,
+QWidget#LoginRail,
+QWidget#RegisterRail {
+    background: #F1F9F5; border: none;
+}
+QStackedWidget#LoginFormStack,
+QWidget#LoginFormPage,
+QWidget#RegisterRoot,
+QStackedWidget#RegisterWizardStack {
+    background: #FFFFFF; border: none;
+}
+QLabel#LoginProductCopy { color: #475569; font-size: 14px; }
+QLabel#LoginPrivacyCopy { color: #475569; font-size: 11px; line-height: 1.45; }
+QLabel#LoginFormTitle {
+    font-family: "__SHANHENG_TITLE_FONT__"; color: #0B1536;
+    font-size: 27px; font-weight: 400; min-height: 38px;
+}
+QLabel[class="LoginFormCopy"] { color: #475569; font-size: 13px; }
+QLabel[class="LoginFieldLabel"] { color: #14213D; font-size: 14px; font-weight: 600; }
+QLabel[class="RegisterFieldHint"] { color: #64748B; font-size: 11px; }
+QLineEdit#LoginInput,
+QComboBox#LoginCombo,
+QDoubleSpinBox#LoginNumber,
+QSpinBox#LoginNumber {
+    background: #FFFFFF; color: #14213D; border: 1px solid #CBD5E1;
+    border-radius: 6px; padding: 0 13px; font-size: 14px;
+    selection-background-color: #059669; selection-color: #FFFFFF;
+}
+QLineEdit#LoginInput:hover,
+QComboBox#LoginCombo:hover,
+QDoubleSpinBox#LoginNumber:hover,
+QSpinBox#LoginNumber:hover { border-color: #94A3B8; }
+QLineEdit#LoginInput:focus,
+QComboBox#LoginCombo:focus,
+QDoubleSpinBox#LoginNumber:focus,
+QSpinBox#LoginNumber:focus { border: 2px solid #059669; padding: 0 12px; }
+QLineEdit#LoginInput { min-height: 50px; max-height: 50px; }
+QLineEdit#LoginCompactInput { min-height: 45px; max-height: 45px; }
+QComboBox#LoginCombo,
+QDoubleSpinBox#LoginNumber,
+QSpinBox#LoginNumber { min-height: 45px; max-height: 45px; }
+QLabel#FixedUnitLabel { color: #64748B; font-size: 12px; background: #FFFFFF; }
+QPushButton#LoginPrimaryAction,
+QPushButton#RegNextButton {
+    background: #059669; color: #FFFFFF; border: 1px solid #059669;
+    border-radius: 6px; font-size: 17px; font-weight: 600; padding: 0 20px;
+}
+QPushButton#LoginPrimaryAction:hover,
+QPushButton#RegNextButton:hover { background: #047857; border-color: #047857; }
+QPushButton#LoginPrimaryAction:pressed,
+QPushButton#RegNextButton:pressed { background: #065F46; border-color: #065F46; }
+QPushButton#LoginPrimaryAction:focus,
+QPushButton#RegNextButton:focus { border: 2px solid #0B1536; }
+QPushButton#RegBackButton {
+    background: #FFFFFF; color: #14213D; border: 1px solid #94A3B8;
+    border-radius: 6px; font-size: 16px; font-weight: 500; padding: 0 20px;
+}
+QPushButton#RegBackButton:hover { background: #F8FAFC; border-color: #059669; color: #047857; }
+QPushButton#LoginTextLink,
+QPushButton#LoginCreateLink,
+QPushButton#RegisterReturnLogin {
+    background: transparent; border: none; color: #059669;
+    font-size: 13px; font-weight: 600; padding: 3px 0;
+}
+QPushButton#LoginTextLink:hover,
+QPushButton#LoginCreateLink:hover,
+QPushButton#RegisterReturnLogin:hover { color: #047857; text-decoration: underline; }
+QLabel#LoginCreateCopy { color: #475569; font-size: 13px; }
+QCheckBox#LoginRemember {
+    color: #475569; font-size: 13px; spacing: 9px;
+}
+QCheckBox#LoginRemember::indicator {
+    width: 18px; height: 18px; border: 1px solid #94A3B8;
+    border-radius: 3px; background: #FFFFFF;
+}
+QCheckBox#LoginRemember::indicator:checked { background: #059669; border-color: #059669; }
+QFrame#LoginRule { background: #E2E8F0; border: none; min-height: 1px; max-height: 1px; }
+
+QFrame#RegisterStepRow { background: transparent; border: 1px solid transparent; border-radius: 20px; }
+QFrame#RegisterStepRow[state="active"] { background: #F3FBF7; border-color: #31B987; }
+QLabel#RegisterStepNumber {
+    background: #FFFFFF; color: #64748B; border: 1px solid #CBD5E1;
+    border-radius: 15px; font-size: 13px; font-weight: 600;
+}
+QLabel#RegisterStepNumber[state="active"],
+QLabel#RegisterStepNumber[state="complete"] {
+    background: #059669; color: #FFFFFF; border-color: #059669;
+}
+QLabel#RegisterStepName { color: #475569; font-size: 13px; }
+QFrame#RegisterStepRow[state="active"] QLabel#RegisterStepName,
+QFrame#RegisterStepRow[state="complete"] QLabel#RegisterStepName { color: #047857; font-weight: 600; }
+QLabel#RegisterStepCheck { background: transparent; border: none; }
+QFrame#RegisterStepConnector { background: #CBD5E1; border: none; }
+QLabel#LoginHint { color: #64748B; font-size: 11px; }
+QLabel#LoginHint[error="true"] { color: #B42318; }
+
+QPushButton[class="GenderChoice"] {
+    background: #FFFFFF; color: #14213D; border: 1px solid #CBD5E1;
+    border-radius: 6px; text-align: center; padding: 0; font-size: 14px;
+}
+QPushButton[class="GenderChoice"]:hover { border-color: #059669; }
+QPushButton[class="GenderChoice"]:checked {
+    background: #EAF7F1; color: #047857; border: 2px solid #059669; font-weight: 600;
+}
+
+QWidget#RegisterV6Tags QPushButton[class="TagChip"],
+QWidget#RegisterPreferenceTags QPushButton[class="TagChip"] {
+    min-height: 34px; max-height: 34px; min-width: 0;
+    background: #FFFFFF; color: #334155; border: 1px solid #AEBBD0;
+    border-radius: 5px; padding: 0 8px; font-size: 12px; font-weight: 500;
+}
+QWidget#RegisterV6Tags QPushButton[class="TagChip"]:hover,
+QWidget#RegisterPreferenceTags QPushButton[class="TagChip"]:hover { border-color: #0891B2; }
+QWidget#RegisterV6Tags QPushButton[class="TagChip"]:checked,
+QWidget#RegisterPreferenceTags QPushButton[class="TagChip"]:checked {
+    background: #E8F6F8; color: #0E7490; border: 2px solid #0891B2; font-weight: 600;
+}
+QWidget#RegisterV6Tags QLabel#TagGroupTitle,
+QWidget#RegisterPreferenceTags QLabel#TagGroupTitle,
+QLabel#TagGroupTitle { color: #14213D; font-size: 14px; font-weight: 600; }
+QLabel#RegisterSecurityNote { color: #475569; font-size: 11px; }
+
+QToolButton#RegisterGoalCard {
+    background: #FFFFFF; color: #14213D; border: 1px solid #CBD5E1;
+    border-radius: 7px; padding: 12px 8px; font-size: 12px; font-weight: 500;
+}
+QToolButton#RegisterGoalCard:hover { border-color: #059669; background: #F8FCFA; }
+QToolButton#RegisterGoalCard:checked {
+    border: 2px solid #059669; background: #EAF7F1; color: #047857;
+}
+QFrame#RegisterFinishInfo {
+    background: #EFFBFD; border: 1px solid #67C7DE; border-radius: 7px;
+}
+QLabel#RegisterFinishTitle { color: #14213D; font-size: 13px; font-weight: 600; }
+QLabel#RegisterFinishBody { color: #475569; font-size: 11px; }
+
+/* V6 今日方案：三块顶部摘要、等高餐次卡与独立营养分栏。 */
+QFrame#CalorieOverviewCard,
+QFrame#DashboardStatusCard {
+    background: #FFFFFF; border: 1px solid #D7E1E7; border-radius: 8px;
+}
+QFrame#CalorieOverviewCard { border-color: #B9DFCF; }
+QFrame#DashboardStatusCard[tone="green"] { background: #FCFEFD; border-color: #CFE7DD; }
+QFrame#DashboardStatusCard[tone="blue"] { background: #FCFEFF; border-color: #C9DFF0; }
+QLabel#CompletionDetail { color: #475569; font-size: 10px; }
+QFrame#DashboardStatusRule { background: #DDE5E4; border: none; }
+QLabel#DashboardStatusNote { color: #475569; font-size: 10px; }
+QLabel#DashboardStatusNote[tone="blue"] {
+    color: #0B77A7; background: #E9F6FB; border: 1px solid #C5E7F3;
+    border-radius: 5px; padding: 6px 9px;
+}
+QFrame#RecipeCard {
+    min-height: 289px; max-height: 289px; border-radius: 8px;
+}
+QFrame#DailySummaryBar { min-height: 83px; max-height: 83px; }
+QPushButton#DashboardRegenButton {
+    min-width: 155px; max-width: 155px; min-height: 49px; max-height: 49px;
+    border-radius: 7px; font-size: 13px;
+}
+
+/* V6 六项共享侧栏。 */
+QFrame#Sidebar {
+    min-width: 208px; max-width: 208px; background: #FCFBF8;
+    border: none; border-right: 1px solid #D9E0E4;
+}
+QPushButton[class="NavButton"] {
+    min-height: 46px; max-height: 46px; background: transparent;
+    color: #14213D; border: none; border-left: 3px solid transparent;
+    border-radius: 7px; text-align: left; padding: 0 14px;
+    font-size: 15px; font-weight: 500;
+}
+QPushButton[class="NavButton"]:hover { background: #F0F6F2; color: #047857; }
+QPushButton[class="NavButton"]:checked {
+    background: #E5F2EA; color: #047857; border-left: 3px solid #059669;
+    font-weight: 600;
+    spacing: 0px;
+}
+QPushButton[class="NavButton"]:focus { border: 2px solid #4EB58C; border-left: 3px solid #059669; }
+QFrame#ProfileMini {
+    background: rgba(255,255,255,230); border: 1px solid #DDE4E5; border-radius: 7px;
+}
+QFrame#ProfileMini { min-height: 50px; max-height: 50px; }
+
+/* V6 食材详情：16/17 共用真实弹窗，收藏状态只改变星标与说明。 */
+QDialog#FoodDetailDialog {
+    background: #FFFFFF; border: 1px solid #D5DEE4; border-radius: 14px;
+}
+QDialog#FoodDetailDialog QLabel#DialogCaption {
+    color: #0B1536; font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 21px; font-weight: 400; min-height: 30px;
+}
+QPushButton#DialogCloseButton {
+    background: transparent; border: none; border-radius: 5px; padding: 5px;
+}
+QPushButton#DialogCloseButton:hover { background: #F1F5F4; }
+QLabel#FoodDetailImage { border: none; border-radius: 7px; background: #F2F4F3; }
+QLabel#FoodDetailName {
+    color: #0B1536; font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 22px; font-weight: 400; min-height: 30px;
+}
+QFrame#FoodDetailCategoryDot { background: #52B788; border: none; border-radius: 4px; }
+QLabel#FoodDetailCategory { color: #34425C; font-size: 12px; }
+QLabel#FoodDetailSummary { color: #475569; font-size: 11px; line-height: 1.55; }
+QLabel#FoodDetailSectionTitle,
+QLabel#FoodDetailColumnTitle {
+    color: #14213D; font-size: 13px; font-weight: 600;
+}
+QFrame[class="FoodNutritionMetric"] {
+    min-height: 80px; max-height: 80px; background: #F7FBF9;
+    border: 1px solid #B9DEC9; border-radius: 6px;
+}
+QFrame[class="FoodNutritionMetric"][tone="blue"] { background: #F3F9FD; border-color: #B9DCEF; }
+QFrame[class="FoodNutritionMetric"][tone="orange"] { background: #FFF8F0; border-color: #F4C995; }
+QFrame[class="FoodNutritionMetric"][tone="cyan"] { background: #F2FBFC; border-color: #A8E1E4; }
+QLabel#FoodMetricCaption { color: #34425C; font-size: 11px; }
+QLabel#FoodMetricValue { color: #059669; font-size: 20px; font-weight: 600; }
+QLabel#FoodMetricValue[tone="blue"] { color: #0891B2; }
+QLabel#FoodMetricValue[tone="orange"] { color: #EA7100; }
+QLabel#FoodMetricValue[tone="cyan"] { color: #0E8796; }
+QLabel#FoodMetricUnit { color: #34425C; font-size: 10px; }
+QFrame#FoodDetailRule { background: #DFE5E7; border: none; }
+QFrame#FoodDetailBulletDot { background: #14213D; border: none; border-radius: 2px; margin-top: 5px; }
+QLabel#FoodDetailBullet { color: #34425C; font-size: 10px; }
+QPushButton#FoodDetailFavoriteButton {
+    min-width: 104px; max-width: 104px; background: #FFFFFF; color: #047857;
+    border: 1px solid #43B887; border-radius: 5px; padding: 0 9px;
+    font-size: 12px; font-weight: 500;
+}
+QPushButton#FoodDetailFavoriteButton:hover { background: #EFF9F4; }
+QPushButton#FoodDetailFavoriteButton:checked { background: #F3FBF7; color: #047857; }
+QLabel#FoodDetailStateHint { color: #84909D; font-size: 10px; }
+QPushButton#FoodDetailCloseButton {
+    background: #FFFFFF; color: #047857; border: 1px solid #43B887;
+    border-radius: 5px; font-size: 12px; font-weight: 500;
+}
+QPushButton#FoodDetailCloseButton:hover { background: #EFF9F4; }
+
+/* V6 食谱详情：14/15 的 568×506 阅读与收藏布局。 */
+QDialog#RecipeDetailDialog {
+    min-width: 568px; max-width: 568px; min-height: 506px; max-height: 506px;
+    background: #FFFFFF; border: 1px solid #D5DEE4; border-radius: 10px;
+}
+QLabel#RecipeDetailHeroImage { background: #EEF3F0; border: none; border-radius: 7px; }
+QLabel#RecipeDetailTitle {
+    color: #0B1536; font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 22px; font-weight: 400; min-height: 31px;
+}
+QLabel#RecipeDetailDescription { color: #34425C; font-size: 11px; line-height: 1.55; }
+QFrame#RecipeDetailRule,
+QFrame#RecipeDetailColumnRule { background: #DDE4E7; border: none; }
+QFrame#RecipeNutritionStrip { background: transparent; border: none; border-radius: 0; }
+QFrame[class="RecipeNutritionMetric"] {
+    min-height: 58px; max-height: 58px; border: none; border-radius: 6px; padding: 0;
+}
+QFrame[class="RecipeNutritionMetric"][tone="kcal"] { background: #EEF8F1; }
+QFrame[class="RecipeNutritionMetric"][tone="protein"] { background: #EDF6E8; }
+QFrame[class="RecipeNutritionMetric"][tone="carbs"] { background: #EDF5FB; }
+QFrame[class="RecipeNutritionMetric"][tone="fat"] { background: #FFF3E5; }
+QLabel#RecipeKcalValue { color: #059669; font-size: 20px; font-weight: 600; }
+QLabel#RecipeMacroValue { color: #14213D; font-size: 14px; font-weight: 500; }
+QLabel#RecipeMetricUnit { color: #14213D; font-size: 10px; }
+QLabel#RecipeMacroLabel { color: #2F4861; font-size: 11px; }
+QLabel#RecipeMacroLabel[tone="protein"] { color: #078951; }
+QLabel#RecipeMacroLabel[tone="carbs"] { color: #226EAA; }
+QLabel#RecipeMacroLabel[tone="fat"] { color: #D76712; }
+QLabel#RecipeColumnTitle {
+    color: #0B1536; font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 15px; font-weight: 400; min-height: 22px;
+}
+QFrame#RecipeDetailBulletDot { background: #14213D; border: none; border-radius: 2px; }
+QLabel#RecipeIngredientLine,
+QLabel#RecipeIngredientQuantity,
+QLabel#RecipeStepsText { color: #26344E; font-size: 10px; }
+QScrollArea#RecipeIngredientsScroll,
+QWidget#RecipeIngredientsContent { background: transparent; border: none; }
+QLabel#RecipeStepNumber {
+    color: #FFFFFF; background: #059669; border: none; border-radius: 9px;
+    font-size: 9px; font-weight: 600;
+}
+QLabel#RecipeStepNumber[tone="blue"] { background: #2D8ED3; }
+QLabel#RecipeStepNumber[tone="orange"] { background: #F28A19; }
+QPushButton#RecipeFavoriteButton,
+QPushButton#RecipeCloseButton {
+    background: #FFFFFF; color: #047857; border: 1px solid #42B986;
+    border-radius: 5px; padding: 0 10px; font-size: 12px; font-weight: 500;
+}
+QPushButton#RecipeFavoriteButton:hover,
+QPushButton#RecipeCloseButton:hover { background: #EFF9F4; }
+QPushButton#RecipeFavoriteButton:checked { background: #F1FAF5; color: #047857; }
+QLabel#RecipeFavoriteHint { color: #84909D; font-size: 9px; }
+
+/* V6 第二轮：消除旧规则对搜索框、档案卡和紧凑弹窗的覆盖。 */
+QWidget#LoginFormPage QLineEdit#LoginInput { min-height: 56px; max-height: 56px; }
+QLineEdit#FoodSearchInput {
+    min-width: 274px; max-width: 274px; min-height: 38px; max-height: 38px;
+    padding: 0 12px; border: 1px solid #D7DFE5; border-radius: 6px;
+}
+QFrame#FoodCategoryPanel { padding: 0; }
+QPushButton[class="CategoryFilter"] {
+    min-height: 34px; max-height: 34px; background: #FFFFFF;
+    border: 1px solid #DDE3E7; border-radius: 6px; color: #26334D;
+    padding: 0 8px; text-align: center; font-size: 12px;
+}
+QPushButton[class="CategoryFilter"]:hover { background: #F4F8F6; border-color: #9EC9B4; }
+QPushButton[class="CategoryFilter"]:checked {
+    background: #EDF8F2; border-color: #42B986; color: #047857; font-weight: 600;
+}
+QFrame#TopBar[compact="true"] { min-height: 96px; max-height: 96px; }
+QLabel#ProfileAvatar {
+    min-width: 80px; max-width: 80px; min-height: 80px; max-height: 80px;
+    border-radius: 40px; background: #FFFFFF; border: 1px solid #DCE7E1;
+    color: #079A61; font-size: 29px; font-weight: 800;
+}
+QPushButton[class="ProfileFavoriteOpen"] {
+    background: #FFFFFF; color: #14213D; border: 1px solid #DCE3E7;
+    border-radius: 6px; font-size: 12px; padding: 0 8px;
+}
+QPushButton[class="ProfileFavoriteOpen"]:hover { border-color: #7DC6A7; color: #047857; }
+QDialog#SettingsDialog {
+    min-width: 420px; max-width: 420px; min-height: 480px; max-height: 480px;
+}
+
+/* -------------------------------------------------------------------------
+   V6 清晰度与配色锁定层
+   仅使用深藏青、健康绿、医疗青和克制杏橙；正文不使用低对比灰或紫色。
+   ------------------------------------------------------------------------- */
+QMainWindow,
+QWidget#CentralRoot,
+QStackedWidget { background: #FBFAF7; }
+QDialog { color: #14213D; }
+QLabel { color: #14213D; }
+QLabel[class="HintText"],
+QLabel[class="RegisterFieldHint"],
+QLabel[class="LoginFormCopy"] { color: #475569; }
+
+QFrame#LoginShell {
     background: #FFFFFF;
-    border: 1px solid #E4E7EC;
+    border: 1px solid #D6E0E5;
     border-radius: 12px;
-    max-width: 320px;
 }
-QFrame#ChatBubbleUser {
-    background: #E6FFFA;
-    border: 1px solid #99F6E4;
-    border-radius: 12px;
-    max-width: 300px;
+QStackedWidget#LoginRailStack,
+QWidget#LoginRail,
+QWidget#RegisterRail { background: #F0F8F4; }
+QLineEdit#LoginInput,
+QComboBox#LoginCombo,
+QComboBox#LoginBirthPart,
+QDoubleSpinBox#LoginNumber,
+QSpinBox#LoginNumber {
+    background: #FFFFFF;
+    color: #14213D;
+    border: 1px solid #BFCED8;
+    border-radius: 6px;
+    selection-background-color: #059669;
+    selection-color: #FFFFFF;
 }
-QLabel#ChatBubbleWho {
-    color: #98A2B3;
-    font-size: 10px;
+QLineEdit#LoginInput:focus,
+QComboBox#LoginCombo:focus,
+QComboBox#LoginBirthPart:focus,
+QDoubleSpinBox#LoginNumber:focus,
+QSpinBox#LoginNumber:focus {
+    border: 2px solid #059669;
+}
+QWidget#RegisterBirthDate { background: transparent; border: none; }
+QComboBox#LoginBirthPart {
+    min-height: 45px; max-height: 45px;
+    padding: 0 10px; font-size: 14px;
+}
+QComboBox#LoginBirthPart::drop-down,
+QComboBox#LoginCombo::drop-down { border: none; width: 26px; }
+QComboBox#LoginBirthPart QAbstractItemView,
+QComboBox#LoginCombo QAbstractItemView {
+    background: #FFFFFF; color: #14213D;
+    border: 1px solid #BFCED8;
+    selection-background-color: #E5F3EC;
+    selection-color: #047857;
+    outline: none;
+}
+QPushButton[class="GenderChoice"] {
+    background: #FFFFFF; color: #14213D;
+    border: 1px solid #BFCED8;
+}
+QPushButton[class="GenderChoice"]:checked {
+    background: #E5F3EC; color: #047857;
+    border: 2px solid #059669;
+}
+
+QFrame#DashboardStatusCard[tone="blue"] {
+    background: #F8FCFD; border-color: #B9DFE7;
+}
+QLabel#DashboardStatusIcon[tone="blue"] {
+    color: #0891B2; background: #E4F5F7;
+}
+QLabel#DashboardStatusValue {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 20px; font-weight: 700; min-height: 29px;
+}
+QLabel#DashboardStatusValue[tone="green"] { color: #059669; }
+QLabel#DashboardStatusValue[tone="blue"] { color: #0891B2; }
+QLabel#DashboardStatusNote[tone="blue"] {
+    color: #0E7490; background: #E8F6F8; border-color: #B9DFE7;
+}
+QPushButton#DashboardRegenButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #168BC8, stop:1 #08A96E);
+    color: #FFFFFF; border: 1px solid #087FA0;
+}
+QPushButton#DashboardRegenButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #117EB8, stop:1 #079A65);
+    border-color: #08738F;
+}
+QPushButton#DashboardRegenButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #0E6F9F, stop:1 #078455);
+    border-color: #07677C;
+}
+
+QFrame#FoodSummaryCard[tone="purple"] {
+    background: #F5FBFC; border-color: #C5E4E9;
+}
+QLabel#FoodSummaryIcon[tone="purple"] {
+    color: #0891B2; background: #E4F5F7;
+}
+QLabel#FoodSummaryValue[tone="purple"] { color: #0891B2; }
+
+QFrame[class="ProfileValueBlock"][tone="purple"],
+QFrame[class="HealthValueBlock"][tone="purple"],
+QFrame[class="SettingsHealthTile"][tone="purple"] {
+    background: #F5FBFC; border-color: #C5E4E9;
+}
+QLabel#ProfileValueIcon[tone="purple"],
+QLabel#HealthValueIcon[tone="purple"] {
+    color: #0891B2; background: #E4F5F7;
+}
+QFrame[class="FavoritePanelHeader"][tone="blue"] { background: #E8F6F8; }
+QFrame#FavoritePanel[tone="blue"] QLabel#FavoritePanelTitle { color: #0E7490; }
+QLabel#DailySummaryValue[tone="blue"] { color: #0891B2; }
+
+/* V6 第三轮精修：注册按钮、冰箱字重与清冰箱玻璃按钮。 */
+QPushButton#RegNextButton,
+QPushButton#RegBackButton {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 16px;
     font-weight: 700;
 }
-QLabel#ChatBubbleText {
-    color: #101828;
+QToolButton#RegisterGoalCard {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-weight: 600;
+}
+
+QWidget#FridgePage QLabel,
+QWidget#FridgePage QPushButton,
+QWidget#FridgePage QLineEdit,
+QWidget#FridgePage QComboBox,
+QWidget#FridgePage QSpinBox,
+QWidget#FridgePage QDoubleSpinBox,
+QWidget#FridgePage QDateEdit,
+QWidget#FridgePage QTableWidget,
+QWidget#FridgePage QHeaderView::section {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-weight: 600;
+}
+QLabel#FridgeSummaryCaption { font-weight: 600; }
+QLabel#FridgeSummaryValue { font-weight: 800; }
+QLabel#FridgeSummaryUnit {
+    color: #475569;
     font-size: 13px;
+    font-weight: 600;
+    padding-bottom: 4px;
 }
-QFrame#AiInputBar {
-    background: #F8FAFD;
-    border: 1px solid #E4E7EC;
-    border-radius: 14px;
+
+QPushButton#FridgeRecipeButton {
+    min-height: 46px;
+    max-height: 46px;
+    color: #FFFFFF;
+    border: 1px solid #047857;
+    border-top: 1px solid #A8F0D0;
+    border-radius: 7px;
+    padding: 0 16px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #39D39A,
+                                stop:0.16 #10BE7B,
+                                stop:0.58 #059F69,
+                                stop:1 #04845A);
 }
-QLineEdit#AiChatInput {
+QPushButton#FridgeRecipeButton:hover {
+    border-color: #036B4A;
+    border-top-color: #D9FFF0;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #52DFAB,
+                                stop:0.18 #19C987,
+                                stop:0.62 #059F69,
+                                stop:1 #03724F);
+}
+QPushButton#FridgeRecipeButton:pressed {
+    border-top-color: #047857;
+    background: #047857;
+}
+
+/* V6 字重校准：正文以 Medium 为基线，标题保持楷体但不再过细。 */
+QLabel#TopTitle,
+QLabel#FoodPageTitle,
+QLabel#LoginFormTitle,
+QLabel#RegisterCenteredTitle,
+QLabel#DialogCaption,
+QLabel[class="SectionTitle"],
+QLabel#MealSectionTitle,
+QLabel#FoodDetailName,
+QLabel#RecipeDetailTitle,
+QLabel#RecipeColumnTitle,
+QDialog#SettingsDialog QLabel#DialogTitle,
+QDialog#HealthTagEditor QLabel#DialogTitle {
+    font-weight: 500;
+}
+QPushButton#LoginPrimaryAction {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 17px;
+    font-weight: 700;
+}
+QLabel#DashboardStatusNote {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 500;
+    min-height: 30px;
+}
+QLabel#DashboardStatusNote[tone="blue"] {
+    padding: 0 10px;
+}
+/* ---- Shopping list / personal recipe tools ---- */
+QDialog#ShoppingListDialog,
+QDialog#RecipeEditorDialog {
+    background: #FFFFFF;
+    color: #202522;
+    font-family: "Noto Sans SC", "Microsoft YaHei UI";
+    font-size: 14px;
+}
+QDialog#RecipeEditorDialog {
+    border: 1px solid #8FC9AA;
+    border-radius: 12px;
+}
+
+QDialog#ShoppingListDialog QLabel#DialogTitle,
+QDialog#RecipeEditorDialog QLabel#DialogTitle {
+    color: #0B1536;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+QLabel#DialogSubtitle,
+QLabel#DialogHint {
+    color: #68716C;
+    font-size: 12px;
+}
+
+QFrame#WebImportFallback {
+    background: #F6FAF8;
+    border: 1px solid #BFD8CC;
+    border-radius: 8px;
+}
+
+QLabel#WebImportFallbackHint {
+    color: #31433B;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+QPlainTextEdit#WebRecipeCopiedText {
+    background: #FFFFFF;
+}
+
+QScrollArea#RecipeEditorContentScroll,
+QWidget#RecipeEditorContentHost {
     background: transparent;
     border: none;
-    padding: 6px 4px;
-    font-size: 13px;
 }
-QPushButton[class="SuggestChip"] {
-    background: #FFFFFF;
-    color: #475467;
-    border: 1px solid #E4E7EC;
-    border-radius: 14px;
-    padding: 6px 10px;
-    font-size: 11px;
-}
-QPushButton[class="SuggestChip"]:hover {
-    background: #F0FDFA;
-    color: #0f766e;
-    border-color: #99F6E4;
-}
-/* 推荐页卡片可更矮，避免与摘要抢空间 */
-QFrame#RecommendPlanPanel QFrame#RecipeCard { min-height: 160px; }
 
+QLabel#FormSectionTitle {
+    color: #202522;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+QFrame#ShoppingListNotice,
+QFrame#ExpiryReminder {
+    background: #F2F7F4;
+    border: 1px solid #CFE0D6;
+    border-radius: 7px;
+    color: #31433B;
+}
+
+QFrame#ExpiryReminder {
+    background: #FFF8F1;
+    border-color: #E8D2C2;
+    color: #74452E;
+}
+
+QTableWidget#ShoppingListTable {
+    background: #FFFFFF;
+    alternate-background-color: #F8FAF8;
+    border: 1px solid #DDE2DE;
+    border-radius: 6px;
+    gridline-color: #E7EBE8;
+    selection-background-color: #E7EFEA;
+    selection-color: #202522;
+}
+
+QTableWidget#ShoppingListTable QHeaderView::section {
+    background: #F2F5F2;
+    color: #3F4944;
+    border: none;
+    border-bottom: 1px solid #DDE2DE;
+    padding: 8px 9px;
+    font-weight: 600;
+}
+
+QDialog#RecipeEditorDialog QLineEdit,
+QDialog#RecipeEditorDialog QComboBox,
+QDialog#RecipeEditorDialog QSpinBox,
+QDialog#ShoppingListDialog QComboBox {
+    background: #FFFFFF;
+    border: 1px solid #CCD5CF;
+    border-radius: 6px;
+    padding: 7px 9px;
+    min-height: 22px;
+    color: #202522;
+}
+
+QDialog#RecipeEditorDialog QPlainTextEdit {
+    background: #FFFFFF;
+    border: 1px solid #CCD5CF;
+    border-radius: 6px;
+    padding: 7px 9px;
+    color: #202522;
+}
+
+QDialog#RecipeEditorDialog QLineEdit:focus,
+QDialog#RecipeEditorDialog QComboBox:focus,
+QDialog#RecipeEditorDialog QSpinBox:focus,
+QDialog#RecipeEditorDialog QPlainTextEdit:focus,
+QDialog#ShoppingListDialog QComboBox:focus {
+    border: 2px solid #28594A;
+    padding: 6px 8px;
+}
+
+/* 食谱大全：与 V6 主界面一致的紧凑桌面目录。 */
+QWidget#RecipeLibraryWidget,
+QWidget#RecipeLibraryCards { background: #FBFAF7; }
+QLineEdit#RecipeLibrarySearch {
+    min-height: 38px; max-height: 38px; padding: 0 12px;
+    background: #FFFFFF; border: 1px solid #D7DFE5; border-radius: 6px;
+    color: #14213D; font-size: 13px;
+}
+QLineEdit#RecipeLibrarySearch:focus { border: 2px solid #08A96E; padding: 0 11px; }
+QLabel#RecipeLibraryCount { color: #475569; font-size: 12px; min-width: 92px; }
+QFrame#RecipeLibraryFilters { background: transparent; border-bottom: 1px solid #DDE3E7; }
+QPushButton[class="RecipeLibraryFilter"] {
+    min-width: 58px; min-height: 32px; max-height: 32px;
+    background: transparent; border: none; border-bottom: 2px solid transparent;
+    border-radius: 0; color: #37435A; padding: 0 8px; font-size: 13px;
+}
+QPushButton[class="RecipeLibraryFilter"]:hover { color: #087A53; background: #F3F8F5; }
+QPushButton[class="RecipeLibraryFilter"]:checked {
+    color: #059669; border-bottom-color: #08A96E; font-weight: 700;
+}
+QPushButton[class="RecipeLibraryFilter"]:focus { border: 1px solid #72CDA8; border-bottom: 2px solid #08A96E; }
+QFrame#RecipeLibraryCard {
+    background: #FFFFFF; border: 1px solid #DDE3E7; border-radius: 7px;
+    min-height: 184px; max-height: 202px;
+}
+QFrame#RecipeLibraryCard:hover { border-color: #8DC9AE; }
+QFrame#RecipeLibraryImageHost { background: #EFF3F0; border: none; border-radius: 6px; }
+QPushButton#RecipeLibraryImage {
+    background: #EFF3F0; border: none; border-radius: 6px 6px 0 0; padding: 0;
+}
+QPushButton#RecipeLibraryImage:focus { border: 2px solid #08A96E; }
+QPushButton#RecipeLibraryFavorite {
+    min-width: 31px; max-width: 31px; min-height: 31px; max-height: 31px;
+    margin: 6px; padding: 0; background: rgba(255,255,255,235);
+    border: 1px solid #D9E2DD; border-radius: 15px;
+}
+QPushButton#RecipeLibraryFavorite:hover { background: #E7F5EE; border-color: #08A96E; }
+QPushButton#RecipeLibraryName {
+    background: transparent; border: none; color: #14213D; text-align: left;
+    padding: 1px 12px 0 12px; font-size: 14px; font-weight: 700;
+}
+QPushButton#RecipeLibraryName:hover { color: #087A53; text-decoration: underline; }
+QPushButton#RecipeLibraryName:focus { border: 1px solid #72CDA8; }
+QLabel#RecipeLibraryMeta { color: #64748B; font-size: 11px; padding: 0 12px; }
+QLabel#RecipeLibraryPageLabel { color: #37435A; font-size: 12px; min-width: 78px; qproperty-alignment: AlignCenter; }
+QLabel#RecipeLibraryEmpty {
+    color: #68716C; font-size: 14px; background: #FFFFFF;
+    border: 1px dashed #C9D4CE; border-radius: 7px;
+}
+
+/* 主窗口外轮廓：深色细线明确界定无边框窗口，不使用阴影。 */
+QWidget#CentralRoot {
+    background: #FFFFFF;
+    border: 1px solid #465166;
+}
+QDialog#LoginDialog,
+QDialog#SettingsDialog,
+QDialog#RecipeDetailDialog,
+QDialog#RecipeEditorDialog,
+QDialog#ShoppingListDialog,
+QDialog#FoodDetailDialog {
+    border: 1px solid #465166;
+}
+
+/* ---- Multimodal food logging / recipe DNA editor ---- */
+QDialog#FoodVisionDialog,
+QDialog#RecipeDnaDialog {
+    background: #FBFAF7;
+    color: #14213D;
+    border: 1px solid #465166;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 14px;
+}
+QLabel#AiDialogTitle {
+    color: #0B1536;
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 21px;
+    font-weight: 400;
+    min-height: 29px;
+}
+QLabel#AiDialogSubtitle { color: #475569; font-size: 12px; }
+QFrame#AiImagePanel,
+QFrame#AiResultPanel {
+    background: #FFFFFF;
+    border: 1px solid #D7DFE5;
+    border-radius: 8px;
+}
+QLabel#FoodVisionPreview {
+    background: #F1F6F3;
+    border: 1px dashed #AFC7BA;
+    border-radius: 7px;
+    color: #64748B;
+    padding: 4px;
+}
+QLabel#AiSectionTitle { color: #14213D; font-size: 15px; font-weight: 700; }
+QLabel#AiFieldLabel { color: #37435A; font-size: 12px; font-weight: 600; }
+QLabel#AiPrivacyHint { color: #64748B; font-size: 11px; line-height: 1.35; }
+QLabel#AiStatusText { color: #475569; font-size: 12px; min-height: 30px; }
+QLabel#AiTodaySummary { color: #475569; font-size: 12px; }
+QLabel#AiConfidenceBadge,
+QLabel#DnaNutritionBadge {
+    color: #087A53;
+    background: #E7F5EE;
+    border: 1px solid #BCE2CF;
+    border-radius: 12px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 600;
+}
+QLabel#DnaSummary {
+    color: #475569;
+    background: #F3F8F5;
+    border-radius: 5px;
+    padding: 7px 9px;
+    min-height: 32px;
+    font-size: 12px;
+}
+QLineEdit#AiResultInput,
+QComboBox#AiResultInput,
+QDoubleSpinBox#AiNumberInput,
+QPlainTextEdit#AiNotes,
+QPlainTextEdit#DnaInstructionInput,
+QPlainTextEdit#DnaStepsInput {
+    background: #FFFFFF;
+    color: #14213D;
+    border: 1px solid #C9D4DD;
+    border-radius: 6px;
+    padding: 7px 10px;
+    selection-background-color: #CDECDD;
+}
+QLineEdit#AiResultInput:focus,
+QComboBox#AiResultInput:focus,
+QDoubleSpinBox#AiNumberInput:focus,
+QPlainTextEdit#AiNotes:focus,
+QPlainTextEdit#DnaInstructionInput:focus,
+QPlainTextEdit#DnaStepsInput:focus {
+    border: 2px solid #08A96E;
+    padding: 6px 9px;
+}
+QLabel#FixedUnitLabel {
+    color: #37435A;
+    background: #FFFFFF;
+    border: none;
+    font-size: 12px;
+}
+QPushButton#AiPrimaryButton {
+    background: #08A96E;
+    color: #FFFFFF;
+    border: 1px solid #08A96E;
+    border-radius: 7px;
+    padding: 0 13px;
+    font-weight: 700;
+    min-height: 40px;
+}
+QPushButton#AiPrimaryButton:hover { background: #078B5C; border-color: #078B5C; }
+QPushButton#AiPrimaryButton:pressed { background: #056B47; }
+QPushButton#AiPrimaryButton:disabled { background: #B8D4C6; border-color: #B8D4C6; }
+QPushButton#AiPrimaryButton:focus { border: 2px solid #0B1536; }
+QPushButton#AiSecondaryButton,
+QPushButton#FoodVisionEntryButton,
+QPushButton#RecipeDnaButton {
+    background: #FFFFFF;
+    color: #087A53;
+    border: 1px solid #7CC8A4;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-weight: 600;
+}
+QPushButton#AiSecondaryButton:hover,
+QPushButton#FoodVisionEntryButton:hover,
+QPushButton#RecipeDnaButton:hover { background: #EAF7F0; border-color: #08A96E; }
+QPushButton#AiSecondaryButton:focus,
+QPushButton#FoodVisionEntryButton:focus,
+QPushButton#RecipeDnaButton:focus { border: 2px solid #087A53; }
+QPushButton#AiLinkButton {
+    background: transparent; border: none; color: #087A53; padding: 3px 7px;
+    text-decoration: underline;
+}
+QPushButton#DnaPresetButton {
+    background: #F3F8F5;
+    color: #255443;
+    border: 1px solid #C9DED2;
+    border-radius: 16px;
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+QPushButton#DnaPresetButton:hover { background: #E4F4EB; border-color: #08A96E; }
+QPushButton#DnaPresetButton:focus { border: 2px solid #087A53; }
+QTableWidget#DnaIngredientTable {
+    background: #FFFFFF;
+    alternate-background-color: #F7FAF8;
+    border: 1px solid #D7DFE5;
+    border-radius: 5px;
+    gridline-color: #E4E9ED;
+    selection-background-color: #DDF1E7;
+    selection-color: #14213D;
+}
+QTableWidget#DnaIngredientTable QHeaderView::section {
+    background: #F0F5F2;
+    color: #37435A;
+    border: none;
+    border-bottom: 1px solid #D7DFE5;
+    padding: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+   V7 最终视觉覆盖层
+   目标：清晰的 Noto Sans SC 正文、华文楷体标题、低饱和多色卡片与稳定渐变。
+   ------------------------------------------------------------------------- */
+* {
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 14px;
+    font-weight: 500;
+    color: #17223B;
+}
+QMainWindow,
+QWidget#CentralRoot,
+QStackedWidget {
+    background: #FFFFFF;
+}
+QWidget#CentralRoot {
+    border: 1px solid #D8E2E6;
+}
+QToolTip {
+    background: #17223B;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 9px;
+}
+
+/* V7 字体层级 */
+QLabel#TopTitle,
+QLabel#FoodPageTitle,
+QLabel[class="SectionTitle"],
+QLabel#MealSectionTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    color: #10213B;
+    font-weight: 500;
+}
+QLabel#TopTitle,
+QLabel#FoodPageTitle {
+    font-size: 32px;
+    min-height: 43px;
+}
+QLabel#TopDate { color: #24344D; font-size: 13px; font-weight: 600; }
+QLabel#TopSubtitle { color: #46566C; font-size: 14px; font-weight: 500; }
+QLabel[class="SectionTitle"] { font-size: 22px; }
+QLabel[class="HintText"],
+QLabel#PageSubtitle { color: #526176; font-size: 13px; font-weight: 500; }
+
+/* V7 主框架与侧栏 */
+QFrame#Sidebar {
+    min-width: 208px;
+    max-width: 208px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FEFFFD, stop:0.55 #FBFDFB, stop:1 #F3F8F4);
+    border: none;
+    border-right: 1px solid #D8E3DE;
+}
+QPushButton[class="NavButton"] {
+    min-height: 46px;
+    max-height: 46px;
+    background: transparent;
+    color: #17223B;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
+    border-radius: 9px;
+    text-align: left;
+    padding: 9px 13px;
+    font-size: 16px;
+    font-weight: 600;
+}
+QPushButton[class="NavButton"]:hover {
+    background: #EFF8F3;
+    color: #047857;
+    border-color: #D6EADF;
+}
+QPushButton[class="NavButton"]:checked {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #DDF4E8, stop:0.72 #EAF6EE, stop:1 #F8F1DE);
+    color: #047857;
+    border: 1px solid #C8E6D7;
+    border-left: 3px solid #0AA873;
+    font-weight: 700;
+}
+QPushButton[class="NavButton"]:focus {
+    border: 2px solid #4AB98A;
+    border-left: 3px solid #059669;
+}
+QFrame#ProfileMini {
+    background: rgba(255,255,255,238);
+    border: 1px solid #D6E2DC;
+    border-radius: 9px;
+}
+QLabel#ProfileMiniName { color: #14213D; font-size: 14px; font-weight: 700; }
+QLabel#ProfileMiniMeta { color: #53637A; font-size: 11px; font-weight: 500; }
+QFrame#WindowTitleBar { background: #FFFFFF; border-bottom: 1px solid #E3E9EC; }
+QFrame#TopBar {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFFFFF, stop:0.72 #FFFFFF, stop:1 #F5FBF7);
+    border: none;
+    min-height: 119px;
+    max-height: 119px;
+}
+
+/* V7 通用按钮、输入框与表格 */
+QPushButton[class="PrimaryButton"],
+QPushButton#LoginPrimaryAction,
+QPushButton#RegNextButton,
+QPushButton#AiPrimaryButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:0.55 #0AA873, stop:1 #16B981);
+    color: #FFFFFF;
+    border: 1px solid #078A5F;
+    border-radius: 8px;
+    font-weight: 700;
+}
+QPushButton[class="PrimaryButton"]:hover,
+QPushButton#LoginPrimaryAction:hover,
+QPushButton#RegNextButton:hover,
+QPushButton#AiPrimaryButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #047857, stop:0.55 #059669, stop:1 #0EA873);
+    border-color: #046C4E;
+}
+QPushButton[class="PrimaryButton"]:pressed,
+QPushButton#LoginPrimaryAction:pressed,
+QPushButton#RegNextButton:pressed,
+QPushButton#AiPrimaryButton:pressed { background: #047857; }
+QPushButton[class="GhostButton"],
+QPushButton#RegBackButton,
+QPushButton#SwitchUserBtn,
+QPushButton#RecipeCloseButton,
+QPushButton#RecipeShareButton,
+QPushButton#RecipeDnaButton {
+    background: rgba(255,255,255,244);
+    color: #17223B;
+    border: 1px solid #C9D6D0;
+    border-radius: 8px;
+    font-weight: 600;
+}
+QPushButton[class="GhostButton"]:hover,
+QPushButton#RegBackButton:hover,
+QPushButton#SwitchUserBtn:hover,
+QPushButton#RecipeCloseButton:hover,
+QPushButton#RecipeShareButton:hover,
+QPushButton#RecipeDnaButton:hover {
+    background: #ECF8F1;
+    color: #047857;
+    border-color: #69BE98;
+}
+QLineEdit,
+QComboBox,
+QSpinBox,
+QDoubleSpinBox,
+QPlainTextEdit {
+    color: #17223B;
+    font-weight: 500;
+    selection-background-color: #BDE8D2;
+    selection-color: #10213B;
+}
+QTableWidget {
+    color: #17223B;
+    font-size: 14px;
+    font-weight: 500;
+    alternate-background-color: #F5FAFD;
+    selection-background-color: #D9F0FA;
+    selection-color: #10213B;
+}
+QTableWidget QHeaderView::section {
+    color: #26364D;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* V7 登录与五步注册：填满 1024×768，不保留米白色外框。 */
+QDialog#LoginDialog {
+    min-width: 1024px;
+    max-width: 1024px;
+    min-height: 768px;
+    max-height: 768px;
+    background: #FFFFFF;
+    border: none;
+}
+QFrame#LoginShell {
+    min-width: 1024px;
+    max-width: 1024px;
+    min-height: 768px;
+    max-height: 768px;
+    background: #FFFFFF;
+    border: none;
+    border-radius: 0;
+}
+QStackedWidget#LoginRailStack,
+QWidget#LoginRail,
+QWidget#RegisterRail {
+    border: none;
+}
+QWidget#LoginRail,
+QWidget#RegisterRail {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #E7F7EC, stop:0.48 #F2FBF6, stop:1 #E6F4EE);
+}
+QStackedWidget#LoginFormStack,
+QWidget#LoginFormPage,
+QWidget#RegisterRoot,
+QStackedWidget#RegisterWizardStack {
+    background: #FFFFFF;
+    border: none;
+}
+QWidget#LoginFormPage QLabel#LoginFormTitle {
+    font-family: "__SHANHENG_BODY_FONT__";
+    color: #111827;
+    font-size: 36px;
+    font-weight: 700;
+    min-height: 52px;
+}
+QWidget#RegisterRoot QLabel#LoginFormTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    color: #10213B;
+    font-size: 30px;
+    font-weight: 500;
+    min-height: 44px;
+}
+QLabel#LoginProductCopy { color: #3E5A4E; font-size: 15px; font-weight: 600; }
+QLabel#LoginPrivacyCopy { color: #415448; font-size: 13px; font-weight: 500; }
+QLabel[class="LoginFormCopy"] { color: #4B5563; font-size: 14px; font-weight: 500; }
+QLabel[class="LoginFieldLabel"] { color: #17223B; font-size: 15px; font-weight: 700; }
+QLabel[class="RegisterFieldHint"] { color: #64748B; font-size: 12px; font-weight: 500; }
+QLineEdit#LoginInput,
+QLineEdit#LoginCompactInput,
+QComboBox#LoginCombo,
+QComboBox#LoginBirthPart,
+QDoubleSpinBox#LoginNumber,
+QSpinBox#LoginNumber {
+    background: #FFFFFF;
+    color: #17223B;
+    border: 1px solid #BFCFC7;
+    border-radius: 8px;
+    padding: 0 15px;
+    font-size: 15px;
+    font-weight: 500;
+}
+QLineEdit#LoginInput:focus,
+QLineEdit#LoginCompactInput:focus,
+QComboBox#LoginCombo:focus,
+QComboBox#LoginBirthPart:focus,
+QDoubleSpinBox#LoginNumber:focus,
+QSpinBox#LoginNumber:focus {
+    border: 2px solid #059669;
+    padding: 0 14px;
+}
+QPushButton[class="GenderChoice"] {
+    background: #FFFFFF;
+    color: #17223B;
+    border: 1px solid #C8D5CF;
+    border-radius: 8px;
+    padding: 0 18px;
+    font-size: 15px;
+    font-weight: 600;
+}
+QPushButton[class="GenderChoice"]:checked {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:1 #16B981);
+    color: #FFFFFF;
+    border-color: #047857;
+}
+QFrame#RegisterStepRow { border-radius: 22px; }
+QFrame#RegisterStepRow[state="active"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #EDF9F3, stop:1 #F8FCFA);
+    border: 1px solid #31B987;
+}
+QLabel#RegisterStepNumber {
+    min-width: 34px;
+    max-width: 34px;
+    min-height: 34px;
+    max-height: 34px;
+    border-radius: 17px;
+    font-size: 14px;
+    font-weight: 700;
+}
+QLabel#RegisterStepName { color: #415448; font-size: 14px; font-weight: 600; }
+QFrame#RegisterStepRow[state="active"] QLabel#RegisterStepName,
+QFrame#RegisterStepRow[state="complete"] QLabel#RegisterStepName { color: #047857; font-weight: 700; }
 QPushButton[class="TagChip"] {
     background: #FFFFFF;
-    color: #475467;
-    border: 1px solid #E4E7EC;
-    border-radius: 14px;
-    padding: 7px 12px;
-    font-size: 12px;
-    text-align: center;
+    color: #435168;
+    border: 1px solid #C9D5D0;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
 }
+QPushButton[class="TagChip"]:hover { background: #F0F9F4; border-color: #5BC094; }
 QPushButton[class="TagChip"]:checked {
-    background: #E6FFFA;
-    color: #0f766e;
-    border: 1px solid #5EEAD4;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #DDF4E8, stop:1 #ECF8F1);
+    color: #047857;
+    border: 1px solid #059669;
     font-weight: 700;
 }
-QPushButton[class="TagChip"]:hover {
-    border-color: #99F6E4;
+QPushButton#LoginPrimaryAction,
+QPushButton#RegNextButton,
+QPushButton#RegBackButton { font-size: 17px; }
+
+/* V7 今日方案 */
+QFrame#CalorieOverviewCard {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F7FFFB, stop:0.62 #FFFFFF, stop:1 #EEF9F4);
+    border: 1px solid #A9D9C3;
+    border-radius: 10px;
 }
-QLabel#TagGroupTitle {
-    color: #101828;
+QFrame#DashboardStatusCard[tone="green"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F1FBF6, stop:1 #FFFFFF);
+    border: 1px solid #C2E6D4;
+    border-radius: 10px;
+}
+QFrame#DashboardStatusCard[tone="blue"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #EFFAFE, stop:1 #FFFFFF);
+    border: 1px solid #B9DFEA;
+    border-radius: 10px;
+}
+QLabel#MetricKcal { color: #059669; font-size: 30px; font-weight: 700; }
+QLabel#OverviewCaption,
+QLabel#DashboardStatusCaption { color: #17223B; font-size: 14px; font-weight: 700; }
+QLabel#CompletionValue { color: #059669; font-size: 28px; font-weight: 700; }
+QLabel#DashboardStatusValue { font-size: 23px; font-weight: 700; }
+QLabel#DashboardStatusNote { color: #34465B; font-size: 12px; font-weight: 600; }
+QFrame#RecipeCard[mealType="breakfast"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #FFFDF8, stop:1 #FFFAF1);
+}
+QFrame#RecipeCard[mealType="lunch"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #F8FFFC, stop:1 #F1FBF6);
+}
+QFrame#RecipeCard[mealType="dinner"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #F8FBFF, stop:1 #F2F5FF);
+}
+QLabel#MealTag { font-size: 15px; font-weight: 700; }
+QLabel#DishName { color: #17223B; font-size: 13px; font-weight: 700; }
+QFrame#DailySummaryBar {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFFFFF, stop:0.72 #FFFFFF, stop:1 #F1FAF6);
+    border: 1px solid #D7E3DE;
+    border-radius: 9px;
+}
+
+/* V7 食材库 */
+QFrame#FoodSummaryCard[tone="green"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E6F8EF, stop:1 #F5FCF8);
+    border: 1px solid #9BD6B9;
+}
+QFrame#FoodSummaryCard[tone="orange"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFF0D9, stop:1 #FFF8ED);
+    border: 1px solid #F1C989;
+}
+QFrame#FoodSummaryCard[tone="purple"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #EEE7FA, stop:1 #F8F5FE);
+    border: 1px solid #CDBBE9;
+}
+QFrame#FoodSummaryCard { border-radius: 10px; }
+QLabel#FoodSummaryCaption { color: #34445C; font-size: 14px; font-weight: 700; }
+QLabel#FoodSummaryValue { font-size: 27px; font-weight: 700; }
+QFrame#FoodCategoryPanel {
+    background: #FFFFFF;
+    border: 1px solid #D7E1DD;
+    border-radius: 10px;
+}
+QPushButton[class="CategoryFilter"] {
+    background: #FFFFFF;
+    color: #34445C;
+    border: 1px solid #D0DAD6;
+    border-radius: 7px;
+    font-weight: 600;
+}
+QPushButton[class="CategoryFilter"]:checked {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:1 #13B77E);
+    color: #FFFFFF;
+    border-color: #047857;
+}
+QLineEdit#FoodSearchInput,
+QLineEdit#FavoriteSearchInput,
+QLineEdit#RecipeLibrarySearch {
+    background: #FFFFFF;
+    border: 1px solid #C9D6D0;
+    border-radius: 8px;
+    color: #17223B;
+    font-size: 14px;
+}
+
+/* V7 智能推荐 */
+QFrame#AiAssistantPanel {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFFFFF, stop:0.75 #FFFFFF, stop:1 #F2FAF6);
+    border: 1px solid #D2E0D9;
+    border-radius: 11px;
+}
+QFrame#ChatBubbleUser {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #079D6A, stop:0.62 #16B981, stop:1 #78C6A5);
+    border: 1px solid #078B60;
+    border-radius: 12px;
+}
+QFrame#ChatBubbleUser QLabel#ChatBubbleText { color: #FFFFFF; font-size: 14px; font-weight: 600; }
+QFrame#ChatBubbleUser QLabel#ChatBubbleTime { color: #E7FFF4; }
+QFrame#ChatBubbleAi {
+    background: #FFFFFF;
+    border: 1px solid #D4DED9;
+    border-radius: 12px;
+}
+QFrame#ChatBubbleAi QLabel#ChatBubbleText { color: #17223B; font-size: 14px; font-weight: 500; }
+QPushButton[class="SuggestChip"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E7F7EF, stop:1 #F4FBF7);
+    color: #047857;
+    border: 1px solid #69C49A;
+    border-radius: 8px;
+    font-weight: 600;
+}
+QFrame#AiInputBar {
+    background: #FFFFFF;
+    border: 1px solid #CEDAD4;
+    border-radius: 10px;
+}
+QFrame#AiAttachmentTray {
+    background: #EEF8F3;
+    border: 1px solid #9FD4B9;
+    border-radius: 8px;
+}
+QLabel#AiAttachmentLabel {
+    color: #176B4A;
+    border: none;
     font-size: 13px;
+}
+QPushButton#AiAttachmentClear {
+    color: #047857;
+    background: transparent;
+    border: none;
+    padding: 3px 8px;
+    font-weight: 600;
+}
+QPushButton#AiAttachmentClear:hover { color: #B54736; }
+QPushButton#AiSendButton {
+    min-width: 144px;
+    max-width: 144px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #168BC8, stop:1 #08A96E);
+    border: 1px solid #087FA0;
+    border-radius: 9px;
+    color: #FFFFFF;
     font-weight: 700;
 }
-QLabel#HealthDimTitle {
-    color: #667085;
+QPushButton#AiSendButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #117EB8, stop:1 #079A65);
+}
+QPushButton#AiPhotoButton {
+    min-width: 144px;
+    max-width: 144px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0;
+    color: #047857;
+    border: 1px solid #78C6A0;
+    border-radius: 9px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #F7FCF9, stop:1 #EAF8F1);
+    font-weight: 600;
+}
+
+/* 冰箱拍照识别弹窗：照片与可编辑结果分栏 */
+QDialog#FridgeVisionDialog {
+    background: #FBFDFB;
+    border: 1px solid #76B996;
+}
+QFrame#FridgeVisionPhotoCard,
+QFrame#FridgeVisionResultCard {
+    background: #FFFFFF;
+    border: 1px solid #C8DAD1;
+    border-radius: 12px;
+}
+QLabel#FridgeVisionPreview {
+    color: #617085;
+    background: #F2F8F5;
+    border: 1px dashed #8DBAA4;
+    border-radius: 10px;
+    font-size: 13px;
+}
+QLabel#VisionConfidenceBadge {
+    color: #047857;
+    background: #E8F7EF;
+    border: 1px solid #B7E0CA;
+    border-radius: 12px;
+    padding: 3px 9px;
     font-size: 12px;
     font-weight: 600;
 }
-QLabel#HealthChip {
-    background: #E6FFFA;
-    color: #0f766e;
-    border: 1px solid #5EEAD4;
-    border-radius: 6px;
-    padding: 6px 10px;
+QPushButton#FridgePhotoAddButton {
+    color: #047857;
+    border-color: #84C7A5;
+    background: #F7FCF9;
+}
+
+/* V7 我的收藏与我的档案 */
+QFrame#FavoritePanel,
+QFrame#ProfileOverviewCard,
+QFrame#ProfileHealthCard,
+QFrame#ProfileFavoriteCard {
+    background: #FFFFFF;
+    border: 1px solid #D6E0DC;
+    border-radius: 10px;
+}
+QFrame[class="FavoritePanelHeader"][tone="orange"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFF0DE, stop:1 #FFF7EE);
+}
+QFrame[class="FavoritePanelHeader"][tone="blue"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E5F5FA, stop:1 #F0FAFC);
+}
+QLabel#FavoritePanelTitle { font-size: 16px; font-weight: 700; }
+QFrame#FavoriteRecipeRow,
+QFrame#FavoriteFoodRow {
+    background: #FFFFFF;
+    border: 1px solid #DCE5E1;
+    border-radius: 8px;
+}
+QFrame#FavoriteRecipeRow:hover,
+QFrame#FavoriteFoodRow:hover { background: #F2FAF6; border-color: #9ACFB5; }
+QLabel#FavoriteRecipeName { color: #17223B; font-size: 14px; font-weight: 700; }
+QLabel#FavoriteRecipeMeta { color: #526176; font-size: 12px; font-weight: 500; }
+QLabel#FavoriteEmpty { color: #526176; font-size: 14px; font-weight: 500; }
+QFrame[class="ProfileValueBlock"][tone="green"],
+QFrame[class="HealthValueBlock"][tone="green"],
+QFrame[class="ProfileFavoriteBlock"][tone="green"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E7F7EF, stop:1 #F5FBF7);
+    border-color: #B8DDCA;
+}
+QFrame[class="ProfileValueBlock"][tone="blue"],
+QFrame[class="HealthValueBlock"][tone="blue"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E7F3FD, stop:1 #F4F8FE);
+    border-color: #BED5EC;
+}
+QFrame[class="ProfileValueBlock"][tone="orange"],
+QFrame[class="HealthValueBlock"][tone="orange"],
+QFrame[class="ProfileFavoriteBlock"][tone="orange"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFF0DA, stop:1 #FFF8EF);
+    border-color: #EFC98F;
+}
+QFrame[class="ProfileValueBlock"][tone="purple"],
+QFrame[class="HealthValueBlock"][tone="purple"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #EEE7FA, stop:1 #F8F5FE);
+    border-color: #CCBEE7;
+}
+QLabel#ProfileName { color: #10213B; font-size: 21px; font-weight: 700; }
+QLabel#ProfileValueCaption,
+QLabel#HealthValueCaption { color: #34445C; font-size: 12px; font-weight: 700; }
+QLabel#ProfileValueText,
+QLabel#HealthValueText { font-size: 18px; font-weight: 700; }
+
+/* V7 设置弹窗 */
+QDialog#SettingsDialog {
+    min-width: 620px;
+    max-width: 620px;
+    min-height: 690px;
+    max-height: 690px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 #F3FBF7, stop:0.22 #FFFFFF, stop:1 #F8FBFA);
+    border: 1px solid #9DCBB5;
+    border-radius: 16px;
+}
+QWidget#SettingsHeader {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:0.52 #12B981, stop:1 #0891B2);
+    border: none;
+    border-radius: 12px;
+}
+QWidget#SettingsHeader QLabel#DialogTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    color: #FFFFFF;
+    font-size: 30px;
+    font-weight: 500;
+}
+QWidget#SettingsHeader QPushButton#DialogCloseButton { background: transparent; border: none; }
+QLabel#SettingsSectionTitle { color: #17223B; font-size: 19px; font-weight: 700; }
+QLabel#SettingsFieldLabel { color: #526176; font-size: 13px; font-weight: 600; }
+QWidget#SettingsFieldBlock QLineEdit,
+QWidget#SettingsFieldBlock QComboBox,
+QWidget#SettingsFieldBlock QDoubleSpinBox {
+    min-height: 44px;
+    max-height: 44px;
+    background: #FFFFFF;
+    border: 1px solid #8EC6AA;
+    border-radius: 8px;
+    padding: 0 13px;
+    font-size: 15px;
+    font-weight: 600;
+}
+QFrame[class="SettingsHealthTile"] {
+    min-height: 86px;
+    max-height: 86px;
+    border-radius: 10px;
+}
+QFrame[class="SettingsHealthTile"][tone="green"] { background: #F1FAF5; border-color: #B8DDCA; }
+QFrame[class="SettingsHealthTile"][tone="orange"] { background: #FFF8EF; border-color: #EFCF9D; }
+QFrame[class="SettingsHealthTile"][tone="blue"] { background: #F3F8FE; border-color: #C6D8EF; }
+QFrame[class="SettingsHealthTile"][tone="purple"] { background: #F8F5FE; border-color: #D5C9EC; }
+QLabel#SettingsHealthCaption { color: #26364D; font-size: 15px; font-weight: 700; }
+QLabel#SettingsHealthValue { color: #526176; font-size: 13px; font-weight: 500; }
+
+/* V7 食谱详情 */
+QDialog#RecipeDetailDialog {
+    min-width: 720px;
+    max-width: 720px;
+    min-height: 700px;
+    max-height: 700px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFFDF8, stop:0.58 #FFFFFF, stop:1 #FFF4DF);
+    border: 1px solid #D7C9AE;
+    border-radius: 16px;
+}
+QDialog#RecipeDetailDialog QLabel#DialogCaption {
+    font-family: "__SHANHENG_BODY_FONT__";
+    color: #111827;
+    font-size: 29px;
+    font-weight: 700;
+}
+QLabel#RecipeDetailTitle {
+    font-family: "__SHANHENG_BODY_FONT__";
+    color: #111827;
+    font-size: 28px;
+    font-weight: 700;
+}
+QLabel#RecipeDetailDescription { color: #34445C; font-size: 14px; font-weight: 500; }
+QFrame#RecipeNutritionStrip { background: transparent; border: none; }
+QFrame[class="RecipeNutritionMetric"] {
+    min-height: 76px;
+    max-height: 76px;
+    border: 1px solid rgba(255,255,255,150);
+    border-radius: 10px;
+}
+QFrame[class="RecipeNutritionMetric"][tone="kcal"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F6A72A, stop:1 #FFC35B);
+}
+QFrame[class="RecipeNutritionMetric"][tone="protein"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #83B94B, stop:1 #AAD36D);
+}
+QFrame[class="RecipeNutritionMetric"][tone="carbs"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #65A9DA, stop:1 #8DC5EB);
+}
+QFrame[class="RecipeNutritionMetric"][tone="fat"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #EE8D74, stop:1 #F6AD92);
+}
+QFrame[class="RecipeNutritionMetric"] QLabel { color: #FFFFFF; }
+QLabel#RecipeKcalValue { color: #FFFFFF; font-size: 27px; font-weight: 700; }
+QLabel#RecipeMacroValue { color: #FFFFFF; font-size: 22px; font-weight: 700; }
+QLabel#RecipeMetricUnit,
+QLabel#RecipeMacroLabel { color: #FFFFFF; font-size: 13px; font-weight: 600; }
+QLabel#RecipeColumnTitle { color: #17223B; font-size: 19px; font-weight: 700; }
+QLabel#RecipeIngredientLine,
+QLabel#RecipeIngredientQuantity,
+QLabel#RecipeStepsText { color: #17223B; font-size: 13px; font-weight: 500; }
+QPushButton#RecipeFavoriteButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #047857, stop:1 #0AA873);
+    color: #FFFFFF;
+    border: 1px solid #046C4E;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+QPushButton#RecipeFavoriteButton:checked { background: #EAF7F0; color: #047857; }
+
+/* V7 食谱 DNA 改造 */
+QDialog#RecipeDnaDialog {
+    min-width: 920px;
+    min-height: 700px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFFFFF, stop:0.68 #FAFEFC, stop:1 #EAF8F1);
+    border: 1px solid #8FC9AA;
+    border-radius: 14px;
+}
+QDialog#RecipeDnaDialog QLabel#AiDialogTitle {
+    font-family: "__SHANHENG_TITLE_FONT__";
+    color: #10213B;
+    font-size: 28px;
+    font-weight: 500;
+}
+QLabel#AiDialogSubtitle { color: #435168; font-size: 14px; font-weight: 500; }
+QPushButton#DnaPresetButton {
+    min-height: 36px;
+    background: #F0F8F4;
+    color: #236044;
+    border: 1px solid #89C4A4;
+    border-radius: 18px;
+    padding: 0 15px;
     font-size: 13px;
     font-weight: 600;
-    min-height: 24px;
 }
-QFrame#ProfileHealthCard {
+QPushButton#DnaPresetButton:hover { background: #DFF3E9; border-color: #059669; }
+QPlainTextEdit#DnaInstructionInput {
     background: #FFFFFF;
+    border: 1px solid #B9CEC3;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 500;
+}
+QDialog#RecipeDnaDialog QPushButton#AiPrimaryButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #147BC1, stop:0.48 #0891B2, stop:1 #0AA873);
+    border-color: #0A7C82;
+    font-size: 15px;
+}
+QFrame#AiResultPanel {
+    background: rgba(255,255,255,244);
+    border: 1px solid #68B88E;
+    border-radius: 11px;
+}
+QLabel#AiSectionTitle { color: #17223B; font-size: 17px; font-weight: 700; }
+QLabel#DnaSummary {
+    color: #34445C;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #F0F6F3, stop:1 #F7FAF8);
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+}
+QLabel#AiFieldLabel { color: #34445C; font-size: 14px; font-weight: 700; }
+QTableWidget#DnaIngredientTable QHeaderView::section {
+    background: #EEF7F2;
+    color: #34445C;
+    font-size: 13px;
+    font-weight: 700;
+}
+QFrame#DnaFlavorCard {
+    min-height: 164px;
+    max-height: 164px;
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #F7FAF8,stop:1 #ECF8F2);
+    border: 1px solid #B9DCCB;
+    border-radius: 9px;
+}
+QLabel#DnaFlavorTitle { color: #123C2D; font-size: 15px; font-weight: 700; }
+QLabel#DnaFlavorHint { color: #526176; font-size: 11px; }
+QLabel#DnaFlavorSummary {
+    color: #047857;
+    background: #E8F7EF;
+    border: 1px solid #B8DFC9;
+    border-radius: 7px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 700;
+}
+/* ---- 饮食记录与分析：多目标识别、趋势与风险预测 ---- */
+QWidget#DietAnalyticsPage { background: #FBFCFA; }
+QFrame#DietActionBar,
+QFrame#DietMetricCard,
+QFrame#DietPanelCard,
+QFrame#DietInsightCard,
+QFrame#DietRecentCard {
+    background: #FFFFFF;
+    border: 1px solid #D6E2DC;
+    border-radius: 10px;
+}
+QFrame#AdaptiveTargetCard {
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #F2FAF6,stop:0.6 #FFFFFF,stop:1 #EFF8FC);
+    border: 1px solid #A9D7C1;
+    border-radius: 10px;
+}
+QLabel#AdaptiveTargetIcon { background: #DFF5EA; border: none; border-radius: 21px; }
+QLabel#AdaptiveTargetCaption { color: #526176; font-size: 11px; font-weight: 700; }
+QLabel#AdaptiveTargetValue { color: #047857; font-size: 19px; font-weight: 800; }
+QLabel#AdaptiveTargetBadge {
+    color: #64748B; background: #F1F5F4; border: 1px solid #D4DFDA;
+    border-radius: 15px; padding: 0 9px; font-size: 11px; font-weight: 700;
+}
+QLabel#AdaptiveTargetBadge[active="true"] { color: #047857; background: #E7F7EE; border-color: #9ED8B8; }
+QLabel#AdaptiveTargetExplanation { color: #24364D; font-size: 11px; font-weight: 600; }
+QLabel#AdaptiveHealthSummary { color: #0E7490; font-size: 10px; font-weight: 600; }
+QComboBox#AdaptiveWindowCombo,
+QComboBox#FoodVisionReference {
+    background: #FFFFFF; border: 1px solid #B9D0C4; border-radius: 7px; padding: 0 8px;
+}
+QPushButton#DietHealthAction {
+    color: #047857; background: #F2FAF6; border: 1px solid #8ED2B5;
+    border-radius: 8px; font-size: 13px; font-weight: 700;
+}
+QPushButton#DietHealthAction:hover { background: #E5F5EC; }
+QLabel#DietActionHint {
+    color: #475569;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 13px;
+}
+QPushButton#DietPrimaryAction,
+QPushButton#DietSecondaryAction {
+    min-width: 148px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 13px;
+    font-weight: 600;
+}
+QPushButton#DietPrimaryAction {
+    color: #FFFFFF;
+    border: 1px solid #059669;
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #078F70,stop:1 #10B981);
+}
+QPushButton#DietPrimaryAction:hover { background: #078F70; }
+QPushButton#DietSecondaryAction {
+    color: #047857;
+    border: 1px solid #8ED2B5;
+    background: #F3FAF6;
+}
+QPushButton#DietSecondaryAction:hover { background: #E7F6ED; }
+QLabel#DietMetricIcon {
+    background: #F0F9F5;
+    border: none;
+    border-radius: 19px;
+}
+QLabel#DietMetricCaption {
+    color: #53637A;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 12px;
+}
+QLabel#DietMetricValue {
+    color: #14213D;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 17px;
+    font-weight: 700;
+}
+QLabel#DietSectionTitle {
+    color: #0B1536;
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 18px;
+    font-weight: 400;
+}
+QFrame#DietInsightCard { background: #F4FAF7; border-color: #B7DEC9; }
+QLabel#DietInsights {
+    color: #263B50;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 12px;
+}
+QLabel#DietAnalysisMeta {
+    color: #64748B;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 10px;
+}
+QLabel#DietRecentHint {
+    color: #64748B;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 11px;
+    font-weight: 500;
+}
+QPushButton#DietDeleteConfirm {
+    color: #FFFFFF;
+    background: #C2413A;
+    border: 1px solid #A5322D;
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-weight: 700;
+}
+QPushButton#DietDeleteConfirm:hover { background: #A93631; }
+QCheckBox#DietSkipDeletePrompt {
+    color: #475569;
+    spacing: 8px;
+    font-size: 12px;
+    padding-top: 5px;
+}
+QCheckBox#DietSkipDeletePrompt::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #A8B5AE;
+    border-radius: 3px;
+    background: #FFFFFF;
+}
+QCheckBox#DietSkipDeletePrompt::indicator:checked {
+    background: #059669;
+    border-color: #047857;
+}
+QTableWidget#DietRecentTable {
+    background: #FFFFFF;
+    alternate-background-color: #F7FAF8;
+    border: none;
+    color: #14213D;
+    font-family: "__SHANHENG_BODY_FONT__";
+    font-size: 12px;
+    selection-background-color: #E3F4EB;
+    selection-color: #14213D;
+}
+QTableWidget#DietRecentTable QHeaderView::section {
+    background: #F0F7F3;
+    color: #3E5066;
+    border: none;
+    border-bottom: 1px solid #D6E2DC;
+    padding: 4px 7px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------
+   V7 补充视觉稿：冰箱库存、食材拍照录入与餐食拍照识别
+   ------------------------------------------------------------------------- */
+QWidget#FridgePage {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FCFFFD, stop:0.58 #FFFFFF, stop:1 #F1FAF6);
+}
+QFrame#FridgeToolbarPanel {
+    background: rgba(255,255,255,226);
+    border: 1px solid #D8E5DE;
+    border-radius: 11px;
+    padding: 8px;
+}
+QWidget#FridgePage QPushButton#FridgeToolbarButton,
+QWidget#FridgePage QPushButton#FridgePhotoAddButton,
+QWidget#FridgePage QPushButton#FridgeViewToggleButton {
+    min-height: 44px;
+    max-height: 44px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFFFFF, stop:1 #EEF8F3);
+    border: 1px solid #C9D9D1;
+    border-radius: 9px;
+    color: #17223B;
+    font-size: 13px;
+    font-weight: 700;
+}
+QWidget#FridgePage QPushButton#FridgeToolbarButton:hover,
+QWidget#FridgePage QPushButton#FridgePhotoAddButton:hover,
+QWidget#FridgePage QPushButton#FridgeViewToggleButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #E3F7EC, stop:1 #EAF7FA);
+    border-color: #64BE91;
+    color: #047857;
+}
+QWidget#FridgePage QPushButton#FridgeRecipeButton {
+    min-height: 46px;
+    max-height: 46px;
+    color: #FFFFFF;
+    border: 1px solid #087F78;
+    border-radius: 9px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #078F70, stop:0.56 #10B981, stop:1 #0891B2);
+    font-size: 13px;
+    font-weight: 700;
+}
+QWidget#FridgePage QPushButton#FridgeRecipeButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #047857, stop:0.56 #0AA873, stop:1 #087FA0);
+}
+QWidget#FridgePage QLineEdit#FridgeSearchInput,
+QWidget#FridgePage QComboBox#FridgeStatusFilter {
+    min-height: 44px;
+    max-height: 44px;
+    background: rgba(255,255,255,248);
+    border: 1px solid #CEDBD5;
+    border-radius: 9px;
+    padding: 0 12px;
+    color: #23334B;
+}
+QWidget#FridgePage QLineEdit#FridgeSearchInput:focus,
+QWidget#FridgePage QComboBox#FridgeStatusFilter:focus {
+    border: 2px solid #38A87A;
+    padding: 0 11px;
+}
+QFrame#ExpiryReminder {
+    min-height: 52px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #FFF1E3, stop:0.55 #FFF7EE, stop:1 #FFFDF8);
+    border: 1px solid #F1C18E;
+    border-radius: 11px;
+    color: #9A4E25;
+}
+QFrame#ExpiryReminder QLabel {
+    color: #8B4323;
+    font-size: 13px;
+    font-weight: 700;
+}
+QPushButton#ExpiryRecipeButton {
+    min-height: 36px;
+    padding: 0 15px;
+    color: #925027;
+    background: #FFFFFF;
+    border: 1px solid #EAB985;
+    border-radius: 8px;
+    font-weight: 700;
+}
+QPushButton#ExpiryRecipeButton:hover { background: #FFF8F0; border-color: #D98E52; }
+QFrame[class="FridgeSummaryCell"] {
+    border-radius: 11px;
+    margin-right: 10px;
+}
+QFrame[class="FridgeSummaryCell"][tone="green"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F5FCF8, stop:1 #EAF8F1);
+    border-color: #B9E0CC;
+}
+QFrame[class="FridgeSummaryCell"][tone="blue"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F5F9FF, stop:1 #EAF3FF);
+    border-color: #C5D9F3;
+}
+QFrame[class="FridgeSummaryCell"][tone="orange"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFFAF3, stop:1 #FFF1DF);
+    border-color: #EED1A9;
+}
+QFrame[class="FridgeSummaryCell"][tone="red"] {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFF8F8, stop:1 #FFEDEF);
+    border-color: #EEC9CE;
+}
+QTableWidget#FridgeInventoryTable {
+    background: rgba(255,255,255,250);
+    alternate-background-color: #F7FBF9;
+    border: 1px solid #C9D8D1;
+    border-radius: 11px;
+    gridline-color: transparent;
+    selection-background-color: #E3F4EB;
+    selection-color: #17223B;
+}
+QTableWidget#FridgeInventoryTable QHeaderView::section {
+    background: #EFF7F3;
+    color: #304158;
+    border: none;
+    border-bottom: 1px solid #D0DED7;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+}
+QTableWidget#FridgeInventoryTable::item {
+    border: none;
+    border-bottom: 1px solid #E8EFEB;
+    padding: 10px 12px;
+}
+QWidget#FridgeStatusHost { background: transparent; }
+QLabel#FridgeStatusBadge {
+    border-radius: 14px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 700;
+}
+QLabel#FridgeStatusBadge[tone="green"] {
+    color: #047857; background: #E7F7EF; border: 1px solid #B7E1CA;
+}
+QLabel#FridgeStatusBadge[tone="orange"] {
+    color: #B75B13; background: #FFF2DF; border: 1px solid #F1CE9F;
+}
+QLabel#FridgeStatusBadge[tone="red"] {
+    color: #C53B45; background: #FFECEF; border: 1px solid #F2C3C9;
+}
+
+QDialog#FoodVisionDialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #FFFDF8, stop:0.56 #FFFFFF, stop:1 #F0FAF5);
+    border: 1px solid #7CB798;
+    border-radius: 14px;
+    color: #14213D;
+}
+QLabel#FoodVisionTitle {
+    color: #10213B;
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 27px;
+    font-weight: 500;
+}
+QLabel#FoodVisionSubtitle { color: #526176; font-size: 13px; font-weight: 500; }
+QFrame#FoodVisionImagePanel,
+QFrame#FoodVisionResultPanel {
+    background: rgba(255,255,255,244);
+    border: 1px solid #BFD6CB;
+    border-radius: 12px;
+}
+QFrame#FoodVisionResultPanel { border-color: #69B98E; }
+QLabel#FoodVisionPreview {
+    color: #526176;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F4FAF7, stop:1 #EAF7F1);
+    border: 1px dashed #79BC9B;
+    border-radius: 12px;
+    padding: 7px;
+    font-size: 13px;
+    font-weight: 600;
+}
+QLabel#FoodVisionStepHint { color: #047857; font-size: 12px; font-weight: 700; }
+QFrame#FoodVisionAngleCard { background: #F8FCFA; border: 1px solid #C5DDD1; border-radius: 9px; }
+QLabel#FoodVisionAngleTitle { color: #233A4F; font-size: 12px; font-weight: 700; }
+QLabel#FoodVisionAnglePreview {
+    color: #617083; background: #EFF8F3; border: 1px dashed #72BA96;
+    border-radius: 8px; padding: 5px; font-size: 11px; font-weight: 600;
+}
+QPushButton#FoodVisionAngleButton {
+    color: #047857; background: #FFFFFF; border: 1px solid #8CCBAA;
+    border-radius: 7px; font-size: 12px; font-weight: 700;
+}
+QPushButton#FoodVisionAngleButton:hover { background: #EAF7F0; }
+QLabel#FoodVisionRangeLabel {
+    color: #075E54; background: #E9F8F1; border: 1px solid #B6DFC9;
+    border-radius: 7px; padding: 7px 10px; font-size: 13px; font-weight: 700;
+}
+
+/* HealthKit / Health Connect mobile-authorized sync bridge */
+QDialog#HealthSyncDialog { background: #F9FCFA; color: #14213D; }
+QLabel#HealthSyncTitle { color: #10213B; font-size: 27px; font-weight: 700; }
+QLabel#HealthSyncSubtitle { color: #526176; font-size: 13px; }
+QFrame#HealthPrivacyCard { background: #EDF8FC; border: 1px solid #B9DCE8; border-radius: 9px; }
+QLabel#HealthPrivacyText { color: #245166; font-size: 12px; }
+QFrame#HealthSourceCard { background: #FFFFFF; border: 1px solid #C9DDD3; border-radius: 11px; }
+QLabel#HealthSourceIcon { background: #E7F7EF; border: none; border-radius: 26px; }
+QLabel#HealthSourceTitle { color: #17223B; font-size: 16px; font-weight: 700; }
+QLabel#HealthSourceSubtitle { color: #526176; font-size: 12px; }
+QLabel#HealthSourceDetail { color: #0E7490; font-size: 11px; }
+QLabel#HealthStatusBadge { color: #64748B; background: #F1F5F4; border: 1px solid #D3DDD8; border-radius: 15px; font-weight: 700; }
+QLabel#HealthStatusBadge[connected="true"] { color: #047857; background: #E7F7EE; border-color: #9DD6B7; }
+QPushButton#HealthImportButton {
+    color: #FFFFFF; border: 1px solid #078F70; border-radius: 8px;
+    background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #078F70,stop:1 #10B981);
+    font-size: 12px; font-weight: 700;
+}
+QLabel#HealthFormatHint { color: #64748B; font-size: 11px; }
+QLabel#HealthImportResult { color: #334155; background: #F4F7F6; border: 1px solid #D7E1DD; border-radius: 8px; padding: 10px; }
+QLabel#HealthImportResult[state="success"] { color: #047857; background: #E8F7EF; border-color: #A6D8BD; }
+QLabel#HealthImportResult[state="error"] { color: #B42318; background: #FFF1F0; border-color: #F1B8B3; }
+QLabel#FoodVisionSectionTitle { color: #17223B; font-size: 17px; font-weight: 700; }
+QLabel#FoodVisionFieldLabel { color: #34445C; font-size: 12px; font-weight: 700; }
+QDialog#FoodVisionDialog QLineEdit#AiResultInput,
+QDialog#FoodVisionDialog QComboBox#AiResultInput {
+    min-height: 36px;
+    background: #FFFFFF;
+    border: 1px solid #BCD0C6;
+    border-radius: 7px;
+    padding: 0 10px;
+}
+QDialog#FoodVisionDialog QLineEdit#AiResultInput:focus,
+QDialog#FoodVisionDialog QComboBox#AiResultInput:focus {
+    border: 2px solid #0AA873;
+    padding: 0 9px;
+}
+QFrame[class="FoodVisionMetric"] {
+    min-height: 66px;
+    border: 1px solid #D2E1DA;
+    border-radius: 9px;
+}
+QFrame[class="FoodVisionMetric"][tone="green"] { background: #EDF9F3; border-color: #B9DEC9; }
+QFrame[class="FoodVisionMetric"][tone="orange"] { background: #FFF3DF; border-color: #EFCE9A; }
+QFrame[class="FoodVisionMetric"][tone="lime"] { background: #F1F9E8; border-color: #C8DDAF; }
+QFrame[class="FoodVisionMetric"][tone="blue"] { background: #EBF5FD; border-color: #C1D9EC; }
+QFrame[class="FoodVisionMetric"][tone="coral"] { background: #FFF0EA; border-color: #ECC8B9; }
+QLabel#FoodVisionMetricLabel { color: #53637A; font-size: 11px; font-weight: 700; }
+QFrame[class="FoodVisionMetric"] QDoubleSpinBox#AiNumberInput {
+    min-height: 30px;
+    max-height: 30px;
+    background: transparent;
+    border: none;
+    padding: 0 4px;
+    color: #17223B;
+    font-size: 16px;
+    font-weight: 700;
+}
+QFrame[class="FoodVisionMetric"] QLabel#FixedUnitLabel { background: transparent; }
+QDialog#FoodVisionDialog QPlainTextEdit#AiNotes {
+    background: #F8FBF9;
+    border: 1px solid #C8D9D0;
+    border-radius: 8px;
+}
+QPushButton#FoodVisionSaveButton {
+    min-height: 46px;
+    color: #FFFFFF;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #168BC8, stop:0.48 #0891B2, stop:1 #08A96E);
+    border: 1px solid #0A7E8B;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 700;
+}
+QPushButton#FoodVisionSaveButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #117EB8, stop:0.48 #087F9D, stop:1 #079A65);
+}
+QPushButton#FoodVisionSaveButton:disabled {
+    color: #F5FBF8; background: #B6D3C5; border-color: #B6D3C5;
+}
+QPushButton#FoodVisionSaveButton:focus { border: 2px solid #164E63; }
+
+QDialog#FridgeVisionDialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F8FFFB, stop:0.56 #FFFFFF, stop:1 #E8F8F1);
+    border: 1px solid #68AE88;
+    border-radius: 15px;
+    color: #14213D;
+}
+QLabel#FridgeVisionTitle {
+    color: #07865D;
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 29px;
+    font-weight: 700;
+}
+QLabel#FridgeVisionSubtitle { color: #526176; font-size: 13px; font-weight: 500; }
+QFrame#FridgeVisionPhotoCard,
+QFrame#FridgeVisionResultCard {
+    background: rgba(247,253,250,232);
+    border: 1px solid #ACD5C0;
+    border-radius: 14px;
+}
+QFrame#FridgeVisionResultCard { background: rgba(255,255,255,242); }
+QLabel#FridgeVisionPreview {
+    color: #526176;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F4FBF7, stop:0.5 #ECF8F2, stop:1 #E3F4EB);
+    border: 1px dashed #68B88E;
+    border-radius: 14px;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+}
+QLabel#FridgeVisionSectionTitle { color: #17223B; font-size: 18px; font-weight: 700; }
+QDialog#FridgeVisionDialog QLabel#AiFieldLabel { color: #34445C; font-size: 13px; font-weight: 700; }
+QDialog#FridgeVisionDialog QLineEdit#FridgeVisionInput,
+QDialog#FridgeVisionDialog QComboBox#FridgeVisionInput,
+QDialog#FridgeVisionDialog QDateEdit#FridgeVisionInput,
+QDialog#FridgeVisionDialog QDoubleSpinBox#FridgeVisionWeightSpin {
+    min-height: 38px;
+    background: #FFFFFF;
+    border: 1px solid #B9D0C4;
+    border-radius: 8px;
+    padding: 0 10px;
+    color: #17223B;
+    font-size: 13px;
+    font-weight: 600;
+}
+QDialog#FridgeVisionDialog QLineEdit#FridgeVisionInput:focus,
+QDialog#FridgeVisionDialog QComboBox#FridgeVisionInput:focus,
+QDialog#FridgeVisionDialog QDateEdit#FridgeVisionInput:focus,
+QDialog#FridgeVisionDialog QDoubleSpinBox#FridgeVisionWeightSpin:focus {
+    border: 2px solid #0AA873;
+    padding: 0 9px;
+}
+QSlider#FridgeVisionWeightSlider::groove:horizontal {
+    height: 7px; background: #D5E5DD; border-radius: 3px;
+}
+QSlider#FridgeVisionWeightSlider::sub-page:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #0891B2, stop:1 #08A96E);
+    border-radius: 3px;
+}
+QSlider#FridgeVisionWeightSlider::handle:horizontal {
+    width: 18px; height: 18px; margin: -6px 0;
+    background: #FFFFFF; border: 3px solid #08A96E; border-radius: 9px;
+}
+QLabel#VisionConfidenceBadge {
+    color: #047857;
+    background: #E4F7ED;
+    border: 1px solid #9FD6B9;
+    border-radius: 14px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 700;
+}
+QLabel#FridgeVisionDetails {
+    color: #38516A;
+    background: #F0F7F3;
+    border: 1px solid #D5E4DD;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+QLabel#FridgeVisionStatus { color: #526176; font-size: 11px; font-weight: 500; }
+QDialog#FridgeVisionDialog QPushButton#AiPrimaryButton {
+    min-height: 46px;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:0.56 #0AA873, stop:1 #16B981);
+    border: 1px solid #078A5F;
+    border-radius: 9px;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 700;
+}
+QDialog#FridgeVisionDialog QPushButton#AiPrimaryButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #047857, stop:1 #0AA873);
+}
+QDialog#FridgeVisionDialog QPushButton#AiPrimaryButton:disabled {
+    color: #EEF6F2; background: #B6D2C4; border-color: #B6D2C4;
+}
+
+/* V7 补充：识别窗口扩容、等待态与独立食材百科识别。 */
+QDialog#FridgeVisionDialog QLineEdit#FridgeVisionInput:disabled,
+QDialog#FridgeVisionDialog QComboBox#FridgeVisionInput:disabled,
+QDialog#FridgeVisionDialog QDateEdit#FridgeVisionInput:disabled,
+QDialog#FridgeVisionDialog QDoubleSpinBox#FridgeVisionWeightSpin:disabled {
+    color: #829087;
+    background: #F5F7F6;
+    border-color: #D5DCDA;
+}
+QDialog#FridgeVisionDialog QSlider#FridgeVisionWeightSlider:disabled::groove:horizontal,
+QDialog#FridgeVisionDialog QSlider#FridgeVisionWeightSlider:disabled::sub-page:horizontal {
+    background: #DDE3E0;
+}
+QDialog#FridgeVisionDialog QSlider#FridgeVisionWeightSlider:disabled::handle:horizontal {
+    background: #F4F6F5; border-color: #B8C2BD;
+}
+QPushButton#FridgeVisionNextButton {
+    min-width: 142px;
+    color: #047857;
+    background: #F2FAF6;
+    border: 1px solid #78C3A0;
+    border-radius: 9px;
+    padding: 0 13px;
+    font-size: 13px;
+    font-weight: 700;
+}
+QPushButton#FridgeVisionNextButton:hover {
+    background: #E4F5EC; border-color: #08A96E;
+}
+QPushButton#FridgeVisionNextButton:disabled {
+    color: #8AA096; background: #F3F6F4; border-color: #D2DCD7;
+}
+
+QDialog#IngredientVisionDialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F8FFFB, stop:0.58 #FFFFFF, stop:1 #ECF8F3);
+    border: 1px solid #67AD88;
+    border-radius: 15px;
+    color: #14213D;
+    font-family: "__SHANHENG_BODY_FONT__";
+}
+QLabel#IngredientVisionTitle {
+    color: #087A58;
+    font-family: "__SHANHENG_TITLE_FONT__";
+    font-size: 29px;
+    font-weight: 500;
+}
+QLabel#IngredientVisionSubtitle {
+    color: #526176; font-size: 13px; font-weight: 500;
+}
+QFrame#IngredientVisionPhotoCard,
+QFrame#IngredientVisionResultCard {
+    background: rgba(255,255,255,244);
+    border: 1px solid #BBD6C8;
+    border-radius: 14px;
+}
+QFrame#IngredientVisionResultCard { border-color: #75BA96; }
+QLabel#IngredientVisionPreview {
+    color: #34445C;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 #F8FCFA, stop:1 #EDF8F2);
+    border: 1px dashed #73B994;
+    border-radius: 14px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+}
+QPushButton#IngredientVisionChooseButton {
+    min-height: 50px;
+    color: #FFFFFF;
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #059669, stop:0.58 #0AA873, stop:1 #16B981);
+    border: 1px solid #078A5F;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+}
+QPushButton#IngredientVisionChooseButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 #047857, stop:1 #0AA873);
+}
+QPushButton#IngredientVisionChooseButton:disabled {
+    color: #EEF6F2; background: #B6D2C4; border-color: #B6D2C4;
+}
+QLabel#IngredientVisionSectionTitle {
+    color: #17223B; font-size: 18px; font-weight: 700;
+}
+QLabel#IngredientVisionConfidence {
+    color: #047857;
+    background: #E5F7EE;
+    border: 1px solid #A6D9BE;
+    border-radius: 14px;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 700;
+}
+QDialog#IngredientVisionDialog QLineEdit#IngredientVisionInput,
+QDialog#IngredientVisionDialog QComboBox#IngredientVisionInput {
+    min-height: 39px;
+    color: #17223B;
+    background: #FFFFFF;
+    border: 1px solid #B9D0C4;
+    border-radius: 8px;
+    padding: 0 11px;
+    font-size: 13px;
+    font-weight: 600;
+}
+QDialog#IngredientVisionDialog QComboBox#IngredientVisionInput:disabled {
+    color: #718078; background: #F4F7F5; border-color: #D4DDD8;
+}
+QLabel#IngredientVisionCategory {
+    min-height: 28px;
+    color: #087A53;
+    background: #E7F7EF;
+    border: 1px solid #B8E0CA;
+    border-radius: 14px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 700;
+}
+QFrame[class="IngredientVisionInfoCard"] {
+    min-height: 76px;
+    border: 1px solid #D2E0D9;
+    border-radius: 9px;
+}
+QFrame[class="IngredientVisionInfoCard"][tone="green"] {
+    background: #EFF9F4; border-color: #BFDFCE;
+}
+QFrame[class="IngredientVisionInfoCard"][tone="blue"] {
+    background: #EEF7FC; border-color: #C5DAE8;
+}
+QFrame[class="IngredientVisionInfoCard"][tone="orange"] {
+    background: #FFF7EA; border-color: #EAD3AF;
+}
+QLabel#IngredientVisionInfoTitle {
+    color: #263B50; font-size: 12px; font-weight: 700;
+}
+QLabel#IngredientVisionInfoBody {
+    color: #405269; font-size: 11px; font-weight: 500;
+}
+QLabel#IngredientVisionRecipeTitle {
+    color: #17223B; font-size: 14px; font-weight: 700;
+}
+QListWidget#IngredientVisionRecipeList {
+    color: #24364D;
+    background: #FBFDFC;
+    alternate-background-color: #F2F8F5;
+    border: 1px solid #CBDCD4;
+    border-radius: 8px;
+    padding: 4px;
+    outline: none;
+    font-size: 12px;
+}
+QListWidget#IngredientVisionRecipeList::item {
+    min-height: 28px; padding: 3px 8px; border-radius: 5px;
+}
+QListWidget#IngredientVisionRecipeList::item:hover { background: #E9F6EF; }
+QListWidget#IngredientVisionRecipeList::item:selected {
+    color: #075E43; background: #DDF2E7;
+}
+QLabel#IngredientVisionStatus {
+    color: #526176; font-size: 11px; font-weight: 500;
 }
